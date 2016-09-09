@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% include "_favicon.html" %}
+	<title>CKWatson - Start</title>
+	<link href="static/css/index.css" rel="stylesheet">
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="jumbotron">
+					<p><h2>"Elementary [Reactions], my dear Watson!"</h2></p>
+					<p>CKWatson is a chemical-experiment-simulator-ish game where you have to guess the correct mechanism for a certain reaction. Each such reaction is called a "Puzzle".</p>
+					<p>Select a Puzzle below to play with, or <a href="create">create</a> one.</p>
+				</div>
+				<div class="row">
+				    {% for puzzleName in puzzleList %}
+						<a type="button" class="col-md-4 btn" href="play/{{ puzzleName }}">
+							<div class="thumbnail">
+								<img alt="{{ puzzleName }}" src="http://lorempixel.com/400/200/abstract/{{ puzzleName }}">
+								<div class="caption">
+									<h3>{{ puzzleName }}</h3>
+								</div>
+							</div>
+						</a>
+			    	{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="static/js/jquery.min.js">
+	</script> 
+	<script src="static/js/bootstrap.min.js">
+	</script> 
+</body>
+</html>

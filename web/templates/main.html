@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include "_favicon.html" %}
+    <title>CKWatson - {{ mode }}</title>
+    <link href="/static/css/main.css" rel="stylesheet">
+</head>
+
+<body class="unselectable">
+    <div class="container" id="controlPanel">
+        <div class="row">
+            <div class="col-md-12">
+            <h1>CKWatson - {{mode}}</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Elementary Reactions</h3>
+            </div>
+        </div>
+        <div class="row">
+            {% if mode == "play" %}  <div class="col-md-8">
+            {% elif mode == "create" %}<div class="col-md-12"> {% endif %}
+                <table class="table table-hover" id="elementaryReactions">
+                    <thead>
+                        <tr>
+                            <td>Reactant 1</td>
+                            <td>+</td>
+                            <td>Reactant 2</td>
+                            <td>=</td>
+                            <td>Product 1</td>
+                            <td>+</td>
+                            <td>Product 2</td>
+                            <td>Controls</td>
+                        </tr>
+                    </thead>
+                    <tbody id="elementaryReactionsTbody"></tbody>
+                </table>
+                <button class="btn btn-default" id="addElementaryReaction" style="width:100%" type="button">Add another Elementary Reaction</button>
+                {% if mode == "play" %}
+            </div>
+            <div class="col-md-4">
+                <table class="table table-hover table-striped" id="condition">
+                    <thead>
+                        <tr>
+                            <td>Species</td>
+                            <td>Concentration (mol)</td>
+                            <td>Temperature (K)</td>
+                        </tr>
+                    </thead>
+                    <tbody id="conditionTbody"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td>( ↑ Draggable)</td>
+                            <td>
+                                      <input disabled checked type="checkbox">
+                                      Pre-equilibrate
+                            </td>
+                            <td>
+                                React at
+                                <input id="reactionTemperature" type="number" value="300"> K.
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <button class="btn btn-primary" disabled="true" id="plotButton" style="width:100%" type="button">Plot</button>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+    {% if mode == "create" %}
+    <div class="container" id="resultsPanel">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Control &amp; Result</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+               <button class="btn btn-primary" id="proceedButton" style="width:100%" disabled="true" type="button" data-toggle="modal" data-target="#speciesModal">Proceed...</button>
+            </div>
+        </div>
+    </div>
+        <div class="modal fade" id="speciesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel"><input id="puzzleName" placeholder="Name Your Puzzle Here..." value="Untitled Puzzle"></input></h4>
+              </div>
+              <div class="modal-body">
+                <table class="table table-hover table-striped" id="species">
+                    <thead>
+                        <tr>
+                            <td>Species Name</td>
+                            <td>Free Energy</td>
+                            <td>Reagent?</td>
+                        </tr>
+                    </thead>
+                    <tbody id="speciesTbody"></tbody>
+                </table>
+              </div>
+                <div class="modal-footer">
+                    {% if ip == "127_0_0_1" %}
+                        <button type="button" id="saveButton" class="btn btn-primary">Save</button>
+                    {% else %}
+                        <div class="input-group">
+                            <input type="password" id="auth_code" class="form-control" placeholder="Auth Code...">
+                            <span class="input-group-btn">
+                                <button type="button" id="saveButton" class="btn btn-primary">Save</button>
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+          </div>
+        </div>
+    {% elif mode == "play" %}
+    <div class="container" id="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Results, Showing 
+                <div class="btn-group" data-toggle="btns" id="viewControl">
+                    <a class="btn btn-default btn-sm active" href=".view_individual" data-toggle="tab">Individual Figures</a>
+                    <a class="btn btn-default btn-sm       " href=".view_combined"   data-toggle="tab">Combined Figure</a>
+                    <a class="btn btn-default btn-sm       " href=".view_info"       data-toggle="tab">Messages</a>
+                </div>
+                </h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul id="result_nav" class="nav nav-tabs" role="tablist">
+                </ul>
+                <div id="result_panels" class="tab-content">
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <script>
+        var puzzleName = "{{ puzzleName }}";
+        var ip = "{{ ip }}";
+        {% if mode == "play" %}
+            var puzzleData = {{ puzzleData|safe }};
+        {% endif %}
+    </script>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/validator.min.js"></script>
+    <script src="/static/js/lodash.min.js"></script>
+    <script src="/static/js/md5.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/{{ mode }}.js"></script>
+    <script src="/static/js/sortable.min.js"></script>
+    <script src="/static/js/cheet.min.js"></script>
+</body>
+
+</html>
