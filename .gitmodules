@@ -1,6 +1,6 @@
 [submodule "puzzles"]
 	path = puzzles
-	url = git@github.com:ckwatson/puzzles
+	url = git://github.com/ckwatson/puzzles
 [submodule "kernel"]
 	path = kernel
-	url = git@github.com:ckwatson/kernel
+	url = git://github.com/ckwatson/kernel
