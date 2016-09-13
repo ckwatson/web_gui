@@ -129,11 +129,10 @@ def plot():
                 reagent_speciesList = [speciesList[i] for i in range(num_mol) if not if_uninvolvedSpecies[i]]
             reagent_num_rxn = len(preEqulElemRxns)
             reagent_num_mol = len(reagent_speciesList)
-            stream.write('            reagent_num_rxn: '+str(reagent_num_rxn))
-            stream.write('            reagent_num_mol: '+str(reagent_num_mol))
-            stream.write('            reagent_speciesList: '+str(reagent_speciesList))
+            stream.write('            About pre-equilibration:')
+            stream.write('                Elem. Rxn.s used for pre-equilibration (a total of '+str(reagent_num_rxn)+'): \n                    '+str(preEqulElemRxns))
+            stream.write('                which involves '+str(reagent_num_mol)+' species: '+str(reagent_speciesList))
             reagentsDict.append((reagent, reaction_mechanism_class.reaction_mechanism(reagent_num_rxn, reagent_num_mol, reagent_speciesList, preEqulElemRxns, energy_dict)))
-        #stream.write('reagentsDict:',reagentsDict)
         #         - - - - - - - - - - - - - - -
         this_puzzle = puzzle_class.puzzle(num_rxn, num_mol, speciesList, elemRxns, energy_dict, reagent_dictionary = reagentsDict, Ea = Ea)
         #                                 num_rxn, num_mol, speciesList, elemRxns, energy_dict -> fed to class "reaction_mechanism"
