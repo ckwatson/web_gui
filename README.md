@@ -53,7 +53,7 @@ Please note that GitHub Auto-Deployment on Heroku does not support `git submodul
 
 Heroku does not support `git submodules` unless they are specified with a URL using a `git://` protocol. Therefore, to push a commit to the Heroku server, one has to use this command:
 
-    perl -pi -e 's/url = https/url = git/g' .gitmodules && git push heroku && perl -pi -e 's/url = https/url = git/g' .gitmodules
+    perl -pi -e 's/url = https/url = git/g' .gitmodules && git push heroku && perl -pi -e 's/url = git/url = https/g' .gitmodules
 
 We have to do the double `perl` call every time we want to push to Heroku, since GitHub needs `https://` protocol for writing access.
 
