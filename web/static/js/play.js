@@ -158,7 +158,7 @@ addElementaryReaction = function() {
         });
 }
     //Behavior of the rows of elementary reactions -- END
-var serverEventListeners = new Array();
+var serverEventListeners = {};
 plot = function() {
     //Get reactions
     var reactions = $('#elementaryReactionsTbody>tr.bg-success').map(function() {
@@ -203,7 +203,7 @@ plot = function() {
                                     </div>
                                     <div role="tabpanel" class="tab-pane view_combined">
                                     </div>
-                                    <pre role="tabpanel" class="tab-pane view_info"></pre>
+                                    <pre role="tabpanel" class="tab-pane view_info language-python"></pre>
                                 </div>
                                 <div class="panel-footer"></div>
                              </div>`);
@@ -239,17 +239,27 @@ plot = function() {
             dataType: 'json',
             success: function(data) {
                 console.log('Responsed:', data);
-                $('#'+data.jobID+' > .panel-footer').html('Completed at <code>'+Date()+'</code>.');
-                $('#'+data.jobID+' > .panel-body > .view_individual').append(data.plot_individual);
-                $('#'+data.jobID+' > .panel-body > .view_combined').append(data.plot_combined);
-                $('#'+data.jobID+'_nav > a').text('At ' + data.temperature.toString()+'K');
-                setTimeout(function(){ serverEventListeners[data.jobID].close() }, 3000);
-                $('a[href=".view_combined"]').trigger('click'); //switch to combined tab (i call it "view"). Use "click" instead of "tab show" to make sure styling works.
-                $btn.button('reset');
+                if (data.status == 'success') {
+                    $('#'+data.jobID+' > .panel-footer').html('Completed at <code>'+Date()+'</code>.');
+                    $('#'+data.jobID+' > .panel-body > .view_individual').append(data.plot_individual);
+                    $('#'+data.jobID+' > .panel-body > .view_combined').append(data.plot_combined);
+                    $('#'+data.jobID+'_nav > a').text('At ' + data.temperature.toString()+'K');
+                    serverEventListeners[data.jobID].close();
+                    $('a[href=".view_combined"]').trigger('click'); //switch to combined tab (i call it "view"). Use "click" instead of "tab show" to make sure styling works.
+                    console.log($('#'+data.jobID+' > .panel-body > .view_info').get())
+                    Prism.highlightElement($('#'+data.jobID+' > .panel-body > .view_info').get()[0]);
+                    $btn.button('reset');
+                } else {
+                    $('#'+data.jobID+'_nav > a').text('Failed Job');
+                    serverEventListeners[data.jobID].close();
+                    console.log($('#'+data.jobID+' > .panel-body > .view_info').get())
+                    Prism.highlightElement($('#'+data.jobID+' > .panel-body > .view_info').get()[0]);
+                    $btn.button('reset');
+                };
             },
             error: function(xhr, ajaxOptions, thrownError) {
+                //This should seldomly happen. This is triggered nearly only when the connection fails.
                 $btn.button('reset');//On error do this
-                //serverEventListeners[data.jobID].close();
             }
         });
     };
