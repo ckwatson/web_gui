@@ -49,13 +49,15 @@ This uses Flask itself to host the server, but would lose the ability to send [S
 
 ### Run on Heroku 
 
-Please note that GitHub Auto-Deployment on Heroku does not support `git submodules`, so we have to do it manually.
+Please use [this Buildpack](https://github.com/dmathieu/heroku-buildpack-submodules#installation) for Auto-Deployment Support on submodules.
+
+~~Please note that GitHub Auto-Deployment on Heroku does not support `git submodules`, so we have to do it manually.
 
 Heroku does not support `git submodules` unless they are specified with a URL using a `git://` protocol. Therefore, to push a commit to the Heroku server, one has to use this command:
 
     perl -pi -e 's/url = https/url = git/g' .gitmodules && git push heroku && perl -pi -e 's/url = git/url = https/g' .gitmodules
 
-We have to do the double `perl` call every time we want to push to Heroku, since GitHub needs `https://` protocol for writing access.
+We have to do the double `perl` call every time we want to push to Heroku, since GitHub needs `https://` protocol for writing access.~~
 
 Folder Structure
 ----------------
