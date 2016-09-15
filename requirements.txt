@@ -1,3 +1,4 @@
+colored-traceback==0.2.2
 colorlog==2.7.0
 cycler==0.10.0
 Flask==0.10.1
