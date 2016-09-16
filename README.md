@@ -3,6 +3,8 @@ CKWatson Online
 
 A Chemical Kinetics Simulator Game as a webapp, written in Python.
 
+[Screenshot](http://i.imgur.com/UVizS1S.png)
+
 Installation
 ------------
 
