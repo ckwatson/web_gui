@@ -36,13 +36,14 @@ class ListStream:
     def flush(self):
         pass
 # Initialize logger:
-logger = logging.getLogger(__name__)        # tell the program to send messages on its own behalf.
-logger.setLevel(logging.DEBUG)              # There are five levels of logging (in ascending order): DEBUG, INFO, WARNING, ERROR and CRITICAL. Setting level to INFO would show messages from INFO, WARNING, ERROR and CRITICAL.
-logger.propagate = 0
-handler = colorlog.StreamHandler()
+rootLogger = logging.getLogger()            # access the root logger
+rootLogger.removeHandler(logging.getLogger().handlers[0])
+handler = colorlog.StreamHandler()          # create a handler for printing messages onto the console
 handler.setFormatter(colorlog.ColoredFormatter(
     '%(log_color)s%(levelname)s%(reset)s:%(bold)s%(name)s%(reset)s:%(message)s'))
-logger.addHandler(handler)
+rootLogger.addHandler(handler)              # attach the to-console handler to the root logger 
+logger = logging.getLogger(__name__)        # tell the program to send messages on its own behalf.
+logger.setLevel(logging.DEBUG)              # There are five levels of logging (in ascending order): DEBUG, INFO, WARNING, ERROR and CRITICAL. Setting level to INFO would show messages from INFO, WARNING, ERROR and CRITICAL.
 
 #Global variables, and also initializing the webapp using Flask framework:
 path_root = 'results/'
@@ -69,10 +70,7 @@ def plot():
     data = request.get_json()                   #receive JSON data
     # initialize logger for this particular job:
     logging_handler = logging.StreamHandler(stream = ListStream(data['jobID'])) #create a log_handler that streams messages to the web UI specificially for this job.
-    logger.addHandler(logging_handler)          #redirect the logs since NOW
-    driver.logger.addHandler(logging_handler)
-    driver.plotter.logger.addHandler(logging_handler)
-    driver.experiment_class.logger.addHandler(logging_handler)
+    rootLogger.addHandler(logging_handler)          #redirect the logs since NOW
     # now the serious part:
     try:
         # prepare directories:
@@ -229,10 +227,7 @@ def plot():
         logger.error(traceback.format_exc())
         logger.info('Executed for ' + str(time.time() - startTime) + 's.')
         # now unbind all log-handlers, so that the logger won't waste its time sending messages to this audience in later calls.
-        logger.removeHandler(logging_handler)          #redirect the logs since NOW
-        driver.logger.removeHandler(logging_handler)
-        driver.plotter.logger.removeHandler(logging_handler)
-        driver.experiment_class.logger.removeHandler(logging_handler)
+        rootLogger.removeHandler(logging_handler)          #redirect the logs since NOW
         return jsonify(jobID = data['jobID'],
                       status = 'error')
 @app.route('/save', methods=['POST', 'OPTIONS'])
