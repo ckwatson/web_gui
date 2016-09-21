@@ -74,5 +74,12 @@ path:hover {
     float: left;
 }
 .view_info {
-    white-space: pre-wrap
+    white-space: pre-wrap;
+    /* enable selecting on message panel */
+    -webkit-touch-callout: initial;
+    -webkit-user-select: initial;
+    -khtml-user-select: initial;
+    -moz-user-select: initial;
+    -ms-user-select: initial;
+    user-select: initial;
 }
