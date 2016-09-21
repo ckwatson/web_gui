@@ -15,6 +15,8 @@ from kernel.data import puzzle_class, condition_class, solution_class, reaction_
 import numpy as np
 import os, sys, time, mimetypes, _thread, jsonschema, json, hashlib, logging, colorlog, traceback, colored_traceback.auto
 
+np.seterr(all='raise')
+
 #one-liners:
 all_files_in = lambda mypath, end='': [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f)) and not f.startswith('.') and f.endswith(end)]
 
