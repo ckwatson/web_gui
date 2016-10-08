@@ -15,8 +15,6 @@ from kernel.data import puzzle_class, condition_class, solution_class, reaction_
 import numpy as np
 import os, sys, time, mimetypes, _thread, jsonschema, json, hashlib, logging, colorlog, traceback, colored_traceback.auto
 
-np.seterr(all='raise')
-
 #one-liners:
 all_files_in = lambda mypath, end='': [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f)) and not f.startswith('.') and f.endswith(end)]
 
@@ -45,6 +43,11 @@ handler.setFormatter(colorlog.ColoredFormatter(
     '%(log_color)s%(levelname)s%(reset)s:%(bold)s%(name)s%(reset)s:%(message)s'))
 rootLogger.addHandler(handler)              # attach the to-console handler to the root logger 
 logger = logging.getLogger(__name__)        # tell the program to send messages on its own behalf.
+
+def np_err_handler(message, flag):
+    logger.error('NumPy floating-point error: '+message+'\n'+''.join(traceback.format_stack(limit = 7)[:-1]))
+np.seterrcall(np_err_handler)
+np.seterr(all='call')
 
 #Global variables, and also initializing the webapp using Flask framework:
 path_root = 'results/'
