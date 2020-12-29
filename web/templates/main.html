@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     {% include "_favicon.html" %}
     <title>CKWatson - {{ mode }}</title>
@@ -11,7 +12,7 @@
     <div class="container" id="controlPanel">
         <div class="row">
             <div class="col-md-12">
-            <h1>CKWatson - {{mode}}</h1>
+                <h1>CKWatson - {{mode}}</h1>
             </div>
         </div>
         <div class="row">
@@ -20,142 +21,140 @@
             </div>
         </div>
         <div class="row">
-            {% if mode == "play" %}  <div class="col-md-8">
-            {% elif mode == "create" %}<div class="col-md-12"> {% endif %}
-                <table class="table table-hover" id="elementaryReactions">
-                    <thead>
-                        <tr>
-                            <td>Use</td>
-                            <td>Reactant 1</td>
-                            <td>+</td>
-                            <td>Reactant 2</td>
-                            <td>=</td>
-                            <td>Product 1</td>
-                            <td>+</td>
-                            <td>Product 2</td>
-                            <td>Controls</td>
-                        </tr>
-                    </thead>
-                    <tbody id="elementaryReactionsTbody"></tbody>
-                </table>
-                <button class="btn btn-default" id="addElementaryReaction" style="width:100%" type="button">Add another Elementary Reaction</button>
-                {% if mode == "play" %}
-            </div>
-            <div class="col-md-4">
-                <table class="table table-hover table-striped" id="condition">
-                    <thead>
-                        <tr>
-                            <td>Species</td>
-                            <td>Concentration (mol)</td>
-                            <td>Temperature (K)</td>
-                        </tr>
-                    </thead>
-                    <tbody id="conditionTbody"></tbody>
-                    <tfoot>
-                        <tr>
-                            <td>( ↑ Draggable)</td>
-                            <td>
-                                      <input disabled checked type="checkbox">
-                                      Pre-equilibrate
-                            </td>
-                            <td>
-                                React at
-                                <input id="reactionTemperature" type="number" value="300"> K.
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <button class="btn btn-primary" disabled="true" id="plotButton" style="width:100%" type="button">Plot</button>
-            {% endif %}
-            </div>
-        </div>
-    </div>
-    {% if mode == "create" %}
-    <div class="container" id="resultsPanel">
-        <div class="row">
-            <div class="col-md-12">
-                <h3>Control &amp; Result</h3>
+            {% if mode == "play" %} <div class="col-md-8">
+                {% elif mode == "create" %}<div class="col-md-12"> {% endif %}
+                    <table class="table table-hover" id="elementaryReactions">
+                        <thead>
+                            <tr>
+                                <td>Use</td>
+                                <td>Reactant 1</td>
+                                <td>+</td>
+                                <td>Reactant 2</td>
+                                <td>=</td>
+                                <td>Product 1</td>
+                                <td>+</td>
+                                <td>Product 2</td>
+                                <td>Controls</td>
+                            </tr>
+                        </thead>
+                        <tbody id="elementaryReactionsTbody"></tbody>
+                    </table>
+                    <button class="btn btn-default" id="addElementaryReaction" style="width:100%" type="button">Add another Elementary Reaction</button>
+                    {% if mode == "play" %}
+                </div>
+                <div class="col-md-4">
+                    <table class="table table-hover table-striped" id="condition">
+                        <thead>
+                            <tr>
+                                <td>Species</td>
+                                <td>Concentration (mol)</td>
+                                <td>Temperature (K)</td>
+                            </tr>
+                        </thead>
+                        <tbody id="conditionTbody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td>( ↑ Draggable)</td>
+                                <td>
+                                    <input disabled checked type="checkbox">
+                                    Pre-equilibrate
+                                </td>
+                                <td>
+                                    React at
+                                    <input id="reactionTemperature" type="number" value="300"> K.
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <button class="btn btn-primary" disabled="true" id="plotButton" style="width:100%" type="button">Plot</button>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-               <button class="btn btn-primary" id="proceedButton" style="width:100%" disabled="true" type="button" data-toggle="modal" data-target="#speciesModal">Proceed...</button>
+        {% if mode == "create" %}
+        <div class="container" id="resultsPanel">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Control &amp; Result</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <button class="btn btn-primary" id="proceedButton" style="width:100%" disabled="true" type="button" data-toggle="modal" data-target="#speciesModal">Proceed...</button>
+                </div>
             </div>
         </div>
-    </div>
         <div class="modal fade" id="speciesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel"><input id="puzzleName" placeholder="Name Your Puzzle Here..." value="Untitled Puzzle"></input></h4>
-              </div>
-              <div class="modal-body">
-                <table class="table table-hover table-striped" id="species">
-                    <thead>
-                        <tr>
-                            <td>Species Name</td>
-                            <td>Free Energy</td>
-                            <td>Reagent?</td>
-                        </tr>
-                    </thead>
-                    <tbody id="speciesTbody"></tbody>
-                </table>
-              </div>
-                <div class="modal-footer">
-                    {% if ip == "127_0_0_1" %}
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel"><input id="puzzleName" placeholder="Name Your Puzzle Here..." value="Untitled Puzzle"></input></h4>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-hover table-striped" id="species">
+                            <thead>
+                                <tr>
+                                    <td>Species Name</td>
+                                    <td>Free Energy</td>
+                                    <td>Reagent?</td>
+                                </tr>
+                            </thead>
+                            <tbody id="speciesTbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        {% if ip == "127_0_0_1" %}
                         <button type="button" id="saveButton" class="btn btn-primary">Save</button>
-                    {% else %}
+                        {% else %}
                         <div class="input-group">
                             <input type="password" id="auth_code" class="form-control" placeholder="Auth Code...">
                             <span class="input-group-btn">
                                 <button type="button" id="saveButton" class="btn btn-primary">Save</button>
                             </span>
                         </div>
-                    {% endif %}
-                </div>
-            </div>
-          </div>
-        </div>
-    {% elif mode == "play" %}
-    <div class="container" id="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h3>Results, Showing 
-                <div class="btn-group" data-toggle="btns" id="viewControl">
-                    <a class="btn btn-default btn-sm active" href=".view_individual" data-toggle="tab">Individual Figures</a>
-                    <a class="btn btn-default btn-sm       " href=".view_combined"   data-toggle="tab">Combined Figure</a>
-                    <a class="btn btn-default btn-sm       " href=".view_info"       data-toggle="tab">Messages</a>
-                </div>
-                </h3>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <ul id="result_nav" class="nav nav-tabs" role="tablist">
-                </ul>
-                <div id="result_panels" class="tab-content">
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    {% endif %}
-    <script>
-        var puzzleName = "{{ puzzleName }}";
-        var ip = "{{ ip }}";
-        {% if mode == "play" %}
-            var puzzleData = {{ puzzleData|safe }};
+        {% elif mode == "play" %}
+        <div class="container" id="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Results, Showing
+                        <div class="btn-group" data-toggle="btns" id="viewControl">
+                            <a class="btn btn-default btn-sm active" href=".view_individual" data-toggle="tab">Individual Figures</a>
+                            <a class="btn btn-default btn-sm       " href=".view_combined" data-toggle="tab">Combined Figure</a>
+                            <a class="btn btn-default btn-sm       " href=".view_info" data-toggle="tab">Messages</a>
+                        </div>
+                    </h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <ul id="result_nav" class="nav nav-tabs" role="tablist">
+                    </ul>
+                    <div id="result_panels" class="tab-content">
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endif %}
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.5.2/validator.min.js" integrity="sha512-vZEoK8xRncku4g5GANHh5zobUjeCMbZkSEahrADeAcRlk/1Ignf8sAKojkV4RZLkPw145+ILJFisI2pnjsPtGQ==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js" integrity="sha512-90vH1Z83AJY9DmlWa8WkjkV79yfS2n2Oxhsi2dZbIv0nC4E6m5AbH8Nh156kkM7JePmqD6tcZsfad1ueoaovww==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.18.0/js/md5.min.js" integrity="sha512-Hmp6qDy9imQmd15Ds1WQJ3uoyGCUz5myyr5ijainC1z+tP7wuXcze5ZZR3dF7+rkRALfNy7jcfgS5hH8wJ/2dQ==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.10.2/Sortable.min.js" integrity="sha512-ELgdXEUQM5x+vB2mycmnSCsiDZWQYXKwlzh9+p+Hff4f5LA+uf0w2pOp3j7UAuSAajxfEzmYZNOOLQuiotrt9Q==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/prism.min.js" integrity="sha512-9+422Bs3A87UkWfp+qV80Nfv9arhbCXKY1rxrF2seorI36mIIstMiuBfyKLF1yH1nnzQkEWq2xrzT4XU3Z+vrA==" crossorigin="anonymous" data-manual></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cheet.js/0.3.3/cheet.min.js" integrity="sha512-mfL/D2MUCTnRtquEsJNc3eFKmyDdzYJlQICtsookWdp44261VyRX5fUvsNWr0AtdFTY9+hCYHlcfc5XDZ3n7TQ==" crossorigin="anonymous"></script>
-    <script src="/static/js/{{ mode }}.js"></script>
+        <script>
+        var puzzleName = "{{ puzzleName }}";
+        var ip = "{{ ip }}"; { % if mode == "play" % }
+        var puzzleData = { { puzzleData | safe } }; { % endif % }
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.5.2/validator.min.js" integrity="sha512-vZEoK8xRncku4g5GANHh5zobUjeCMbZkSEahrADeAcRlk/1Ignf8sAKojkV4RZLkPw145+ILJFisI2pnjsPtGQ==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js" integrity="sha512-90vH1Z83AJY9DmlWa8WkjkV79yfS2n2Oxhsi2dZbIv0nC4E6m5AbH8Nh156kkM7JePmqD6tcZsfad1ueoaovww==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.18.0/js/md5.min.js" integrity="sha512-Hmp6qDy9imQmd15Ds1WQJ3uoyGCUz5myyr5ijainC1z+tP7wuXcze5ZZR3dF7+rkRALfNy7jcfgS5hH8wJ/2dQ==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.10.2/Sortable.min.js" integrity="sha512-ELgdXEUQM5x+vB2mycmnSCsiDZWQYXKwlzh9+p+Hff4f5LA+uf0w2pOp3j7UAuSAajxfEzmYZNOOLQuiotrt9Q==" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/prism.min.js" integrity="sha512-9+422Bs3A87UkWfp+qV80Nfv9arhbCXKY1rxrF2seorI36mIIstMiuBfyKLF1yH1nnzQkEWq2xrzT4XU3Z+vrA==" crossorigin="anonymous" data-manual></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cheet.js/0.3.3/cheet.min.js" integrity="sha512-mfL/D2MUCTnRtquEsJNc3eFKmyDdzYJlQICtsookWdp44261VyRX5fUvsNWr0AtdFTY9+hCYHlcfc5XDZ3n7TQ==" crossorigin="anonymous"></script>
+        <script src="/static/js/{{ mode }}.js"></script>
 </body>
 
 </html>

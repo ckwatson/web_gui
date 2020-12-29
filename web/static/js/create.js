@@ -20,14 +20,14 @@ if (!Object.keys) Object.keys = function(o) {
     return ret;
 }
 
-dict_reverse = function (obj) {
-  var new_obj = {};
-  for (var prop in obj) {
-    if(obj.hasOwnProperty(prop)) {
-      new_obj[obj[prop]] = prop;
+dict_reverse = function(obj) {
+    var new_obj = {};
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            new_obj[obj[prop]] = prop;
+        }
     }
-  }
-  return new_obj;
+    return new_obj;
 };
 //JS fixes END
 var emptyElementaryReaction = $(`
@@ -44,12 +44,12 @@ var emptyElementaryReaction = $(`
         </tr>
 `);
 addElementaryReaction = function() {
-        var thisElementaryReaction = emptyElementaryReaction.clone();
-        $('#elementaryReactionsTbody').append(thisElementaryReaction);
-        cells = thisElementaryReaction.children('td'); //just a short-hand.
-        cells.children('button.removeReaction').click(removeElementaryReaction);
-        cells.children('button.balanceReaction').click(balanceElementaryReaction);
-        cells.children('input').change(onSelectChange);
+    var thisElementaryReaction = emptyElementaryReaction.clone();
+    $('#elementaryReactionsTbody').append(thisElementaryReaction);
+    cells = thisElementaryReaction.children('td'); //just a short-hand.
+    cells.children('button.removeReaction').click(removeElementaryReaction);
+    cells.children('button.balanceReaction').click(balanceElementaryReaction);
+    cells.children('input').change(onSelectChange);
 };
 removeElementaryReaction = function(e) {
     var thisRow = $(this).parent().parent();
@@ -62,22 +62,22 @@ balanceElementaryReaction = function(e) {
         return $(obj).val();
     });
     var atomsArray = {};
-    for (var i=0; i<3; i++) {
+    for (var i = 0; i < 3; i++) {
         species = speciesList[i];
         if (species == '') continue; //skip empty species.
-        atomsArray = moleculeToAtoms(species, atomsArray, i<2);
+        atomsArray = moleculeToAtoms(species, atomsArray, i < 2);
     };
     var guessedSpecies = '';
     for (i in atomsArray) {
         var number = atomsArray[i];
-        if (number>0) {
-            guessedSpecies+=i;
-            if (number>1) {
+        if (number > 0) {
+            guessedSpecies += i;
+            if (number > 1) {
                 guessedSpecies += number;
             }
         }
     }
-    $('td:nth-child(7) > input',thisRow).val(guessedSpecies);
+    $('td:nth-child(7) > input', thisRow).val(guessedSpecies);
     checkBalance(thisRow);
     checkOverallBalance();
 
@@ -112,11 +112,13 @@ checkBalance = function(thisRow) {
     for (var i in cells) {
         species = cells[i].value;
         if (species == '') continue; //skip empty species.
-        atomsArray = moleculeToAtoms(species, atomsArray, i<2);
+        atomsArray = moleculeToAtoms(species, atomsArray, i < 2);
     };
-    if ($.isEmptyObject(atomsArray)//user emptied the reaction
-     || (cells[0].value == cells[2].value && cells[1].value == cells[3].value) // or this elem. reaction is trivial
-     || (cells[0].value == cells[3].value && cells[1].value == cells[2].value)) { 
+    if ($.isEmptyObject(atomsArray) //user emptied the reaction
+        ||
+        (cells[0].value == cells[2].value && cells[1].value == cells[3].value) // or this elem. reaction is trivial
+        ||
+        (cells[0].value == cells[3].value && cells[1].value == cells[2].value)) {
         thisRow.removeClass('bg-danger');
         thisRow.removeClass('bg-success');
         return false;
@@ -149,17 +151,17 @@ checkOverallBalance = function() {
         $('#proceedButton').addClass('disabled').prop('disabled', true);
     }
 };
-cheat = function () {
+cheat = function() {
     var testRxns = [
-        ["NO"   , "NO"  , "N2O2", ""    ],
-        ["N2O2"    , "Br2"  , "NOBr"   , "NOBr"  ]
+        ["NO", "NO", "N2O2", ""],
+        ["N2O2", "Br2", "NOBr", "NOBr"]
     ];
-    for (var i in testRxns) {//for each pre-set reaction:
+    for (var i in testRxns) { //for each pre-set reaction:
         var rxn = testRxns[i];
         //console.log(rxn); //should be in the shape of ["","","",""];
         addElementaryReaction();
         var selects = $('td > input', $('#elementaryReactionsTbody > tr').last()); //select this newly added row.
-        for (i=0; i<4; i++) {
+        for (i = 0; i < 4; i++) {
             $(selects[i]).val(rxn[i]);
         }
         checkBalance($('#elementaryReactionsTbody > tr').last());
@@ -172,19 +174,19 @@ $(function() {
     $('#proceedButton').click(proceed);
     $('#saveButton').click(save);
     //enable plugins:
-    Sortable.create(document.getElementById("elementaryReactionsTbody"),sortableParams);
+    Sortable.create(document.getElementById("elementaryReactionsTbody"), sortableParams);
     cheet('c h e a t', cheat);
     //create the first elementary reaction row:
     addElementaryReaction();
 });
 //stage 2:
 addSpeciesRow = function(speciesName) {
-    if (speciesName!='') {
+    if (speciesName != '') {
         var $this = $(`
             <tr draggable="true">
-                <td class="speciesName">`+speciesName+`</td>
+                <td class="speciesName">` + speciesName + `</td>
                 <td class="energy">
-                    <input type="number" value="`+_.random(0,500)+`"></input>
+                    <input type="number" value="` + _.random(0, 500) + `"></input>
                 </td>
                 <td class="input-group">
                     <span class="input-group-addon">
@@ -199,33 +201,33 @@ addSpeciesRow = function(speciesName) {
             </tr>`);
         var options = [];
 
-        $( '.dropdown-menu a', $this ).on( 'click', function( event ) {
+        $('.dropdown-menu a', $this).on('click', function(event) {
 
-           var $target = $( event.currentTarget ),
-               val = $target.attr( 'data-value' ),
-               $inp = $target.find( 'input' ),
-               idx;
+            var $target = $(event.currentTarget),
+                val = $target.attr('data-value'),
+                $inp = $target.find('input'),
+                idx;
 
-           if ( ( idx = options.indexOf( val ) ) > -1 ) {
-              options.splice( idx, 1 );
-              setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
-           } else {
-              options.push( val );
-              setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
-           }
+            if ((idx = options.indexOf(val)) > -1) {
+                options.splice(idx, 1);
+                setTimeout(function() { $inp.prop('checked', false) }, 0);
+            } else {
+                options.push(val);
+                setTimeout(function() { $inp.prop('checked', true) }, 0);
+            }
 
-           $( event.target ).blur();
-              
-           console.log( options );
-           return false;
+            $(event.target).blur();
+
+            console.log(options);
+            return false;
         });
         //above: Bootstrap drop-menu of checkboxes, from <https://codepen.io/bseth99/pen/fboKH>.
         for (i in reactions) {
-            var reaction_description = reactions[i][0]+' + '+reactions[i][1]+' -> '+reactions[i][2]+' + '+reactions[i][3];
+            var reaction_description = reactions[i][0] + ' + ' + reactions[i][1] + ' -> ' + reactions[i][2] + ' + ' + reactions[i][3];
             if ($.inArray(speciesName, reactions[i]) > -1) {
-                $thisCheckbox = $('<li><a href="#" class="small" data-value="option1" tabIndex="-1"><input type="checkbox" checked class="rxn'+i+'"/>'+reaction_description+'</a></li>');
+                $thisCheckbox = $('<li><a href="#" class="small" data-value="option1" tabIndex="-1"><input type="checkbox" checked class="rxn' + i + '"/>' + reaction_description + '</a></li>');
             } else {
-                $thisCheckbox = $('<li><a href="#" class="small" data-value="option1" tabIndex="-1"><input type="checkbox" disabled class="rxn'+i+'"/>'+reaction_description+'</a></li>');
+                $thisCheckbox = $('<li><a href="#" class="small" data-value="option1" tabIndex="-1"><input type="checkbox" disabled class="rxn' + i + '"/>' + reaction_description + '</a></li>');
             };
             $('.dropdown-menu', $this).append($thisCheckbox);
         }
@@ -256,7 +258,7 @@ proceed = function() {
     //empty species table that might be populated from last time clicking proceed button:
     $('#speciesTbody').html('');
     //Get species
-    speciesList = _.uniq(speciesList, function(item, key, a) {return item;});  //unique-ify (i.e. remove repetitive species)
+    speciesList = _.uniq(speciesList, function(item, key, a) { return item; }); //unique-ify (i.e. remove repetitive species)
     //newSpeciesList = _.difference(speciesList, available_molecules);
     //add each species to the species table in stage 2:
     _.each(speciesList, addSpeciesRow);
@@ -264,14 +266,14 @@ proceed = function() {
     if ($('#puzzleName').val() == 'Untitled Puzzle') {
         $('#puzzleName').val(speciesList.join(' '));
     };
-    console.log('speciesList',speciesList,'reactions',reactions);
+    console.log('speciesList', speciesList, 'reactions', reactions);
 };
 pushAlert = function(status, message) {
     var id_int = new Date().getTime();
     $(`<div id="` + id_int + `" class="alert alert-` + status + ` alert-dismissible" role="alert">
            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
            ` + message + `
-       </div>`).appendTo('#speciesModal .modal-body').fadeTo(3000, 500).slideUp(500, function(){
+       </div>`).appendTo('#speciesModal .modal-body').fadeTo(3000, 500).slideUp(500, function() {
         $(this).alert('close');
     });
 }
@@ -287,7 +289,7 @@ save = function() {
         var name = $('.speciesName', $this).text().trim();
         var ifReactant = $('.ifReactant', $this).is(':checked');
         if (ifReactant) {
-            var reagentPER = $('.PERs input', $this).map(function(){return this.checked;}).get();
+            var reagentPER = $('.PERs input', $this).map(function() { return this.checked; }).get();
             reagentPERs[name] = reagentPER;
         };
         var energy = parseFloat($('.energy > input', $this).val());
@@ -298,14 +300,14 @@ save = function() {
     });
     //form parameter object:
     parameters = {
-            auth_code: $('#auth_code').val(),
-            puzzleName: $('#puzzleName').val(),
-            reactions: reactions,
-            speciesNames: speciesNames,
-            speciesIfReactants: speciesIfReactants,
-            speciesEnergies: speciesEnergies,
-            reagentPERs: reagentPERs
-        };
+        auth_code: $('#auth_code').val(),
+        puzzleName: $('#puzzleName').val(),
+        reactions: reactions,
+        speciesNames: speciesNames,
+        speciesIfReactants: speciesIfReactants,
+        speciesEnergies: speciesEnergies,
+        reagentPERs: reagentPERs
+    };
     console.log(parameters);
     //ajax -- post the job:
     $.ajax({
@@ -320,18 +322,18 @@ save = function() {
             $btn.button('reset');
         },
         error: function(xhr, ajaxOptions, thrownError) {
-            pushAlert('danger', 'Error contacting the server: '+thrownError);
-            $btn.button('reset');//On error do this
+            pushAlert('danger', 'Error contacting the server: ' + thrownError);
+            $btn.button('reset'); //On error do this
         }
     });
     //close modal
-    
+
 };
 //=============================================================
 
 
 var hasEmptyElementaryReaction = true;
-if_a_reactant_exists = function () {
+if_a_reactant_exists = function() {
     //check whether a reactant exists -- a chemical reaction without a controllable reactant is pointless, right?
     //this works like "as long as there is one set to true, I say true."
     return $('#conditionTbody input.ifReactant').is(':checked');
@@ -342,28 +344,28 @@ if_a_reactant_exists = function () {
 
 
 addSpecies = function() {
-    addSpeciesRow('','custom');
+    addSpeciesRow('', 'custom');
 }
-    //Behavior of the rows of elementary reactions -- END
+//Behavior of the rows of elementary reactions -- END
 
 
-viewControl = function (viewName) {
+viewControl = function(viewName) {
     $(this).toggleClass('active');
     $(this).data('target').toggle();
 }
 
 var sortableParams = {
-    ghostClass: "bg-info",  // Class name for the drop placeholder
-    chosenClass: "bg-primary",  // Class name for the chosen item
-    animation: 150  // ms, animation speed moving items when sorting, `0` — without animation
+    ghostClass: "bg-info", // Class name for the drop placeholder
+    chosenClass: "bg-primary", // Class name for the chosen item
+    animation: 150 // ms, animation speed moving items when sorting, `0` — without animation
 }
 removeSpecies = function(speciesName) {
     //remove the row of this molecule from the sidebar 
-    $('.species#'+speciesName).remove();
+    $('.species#' + speciesName).remove();
 }
-allSpeciesInvolvedInReactions = function () {
-    return _.uniq($('tr.elementaryReaction>td>select').map(function(i,obj) {return $(obj).val()}));
+allSpeciesInvolvedInReactions = function() {
+    return _.uniq($('tr.elementaryReaction>td>select').map(function(i, obj) { return $(obj).val() }));
 }
-allSpeciesInvolvedInSpeciesList = function () {
-    return _.uniq($('.species').map(function(i,obj) {return $(obj).text()}));
+allSpeciesInvolvedInSpeciesList = function() {
+    return _.uniq($('.species').map(function(i, obj) { return $(obj).text() }));
 }

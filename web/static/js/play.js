@@ -20,14 +20,14 @@ if (!Object.keys) Object.keys = function(o) {
     return ret;
 }
 
-dict_reverse = function (obj) {
-  var new_obj = {};
-  for (var prop in obj) {
-    if(obj.hasOwnProperty(prop)) {
-      new_obj[obj[prop]] = prop;
+dict_reverse = function(obj) {
+    var new_obj = {};
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            new_obj[obj[prop]] = prop;
+        }
     }
-  }
-  return new_obj;
+    return new_obj;
 };
 //JS fixes END
 print = function(content) {
@@ -138,24 +138,24 @@ removeElementaryReaction = function(e) {
     checkOverallBalance();
 }
 addElementaryReaction = function() {
-        thisElementaryReaction = emptyElementaryReaction.clone();
-        $('#elementaryReactionsTbody').append(thisElementaryReaction);
-        cells = thisElementaryReaction.children('td'); //just a short-hand.
-        cells.children('button.removeReaction').click(removeElementaryReaction);
-        cells.children('select').change(onSelectChange);
-        $('td>select',thisElementaryReaction).on('dragover', function (ev) {
-            ev.originalEvent.preventDefault();
-        });
-        $('td>select',thisElementaryReaction).on('drop', function (ev) {
-            ev.originalEvent.preventDefault();
-            var data = ev.originalEvent.dataTransfer.getData("species");
-            if (data!=undefined && data!='') {
-                $(this).val(data);
-                $(this).change();
-            };
-        });
+    thisElementaryReaction = emptyElementaryReaction.clone();
+    $('#elementaryReactionsTbody').append(thisElementaryReaction);
+    cells = thisElementaryReaction.children('td'); //just a short-hand.
+    cells.children('button.removeReaction').click(removeElementaryReaction);
+    cells.children('select').change(onSelectChange);
+    $('td>select', thisElementaryReaction).on('dragover', function(ev) {
+        ev.originalEvent.preventDefault();
+    });
+    $('td>select', thisElementaryReaction).on('drop', function(ev) {
+        ev.originalEvent.preventDefault();
+        var data = ev.originalEvent.dataTransfer.getData("species");
+        if (data != undefined && data != '') {
+            $(this).val(data);
+            $(this).change();
+        };
+    });
 }
-    //Behavior of the rows of elementary reactions -- END
+//Behavior of the rows of elementary reactions -- END
 var serverEventListeners = {};
 plot = function() {
     //Get reactions
@@ -171,7 +171,7 @@ plot = function() {
         var name = $('td.species', this).text().trim();
         var amount = parseFloat($('td>input.amount', this).val());
         var temperature = parseFloat($('td>input.temperature', this).val());
-        return {name, amount, temperature};
+        return { name, amount, temperature };
     });
     //make jobID. this should better be unique across all users and all calls.
     var d = new Date();
@@ -179,23 +179,23 @@ plot = function() {
     var conditions = $.makeArray(conditions).sort();
     var solutionID = md5(JSON.stringify(reactions));
     var conditionID = md5(JSON.stringify(conditions));
-    var jobID = ip+'_'+conditionID+'_'+temperature.toString()+'_'+solutionID+'_'+d.getTime().toString();//$('#result_nav > li').length + 1;
-    if ($('#'+jobID).length>0) {
-        $('#'+jobID+'_nav > a').trigger('click');
+    var jobID = ip + '_' + conditionID + '_' + temperature.toString() + '_' + solutionID + '_' + d.getTime().toString(); //$('#result_nav > li').length + 1;
+    if ($('#' + jobID).length > 0) {
+        $('#' + jobID + '_nav > a').trigger('click');
     } else {
         var $btn = $(this).button('loading');
         parameters = {
-                puzzle: puzzleName,
-                reactions: reactions,
-                temperature: temperature,
-                conditions: conditions,
-                jobID: jobID,
-                solutionID: solutionID,
-                conditionID: conditionID
-            }
+            puzzle: puzzleName,
+            reactions: reactions,
+            temperature: temperature,
+            conditions: conditions,
+            jobID: jobID,
+            solutionID: solutionID,
+            conditionID: conditionID
+        }
         //console.log(parameters);
         //Placeholder for results:
-        var thisResultPanel = $(`<div role="tabpanel" class="tab-pane" id="`+jobID+`">
+        var thisResultPanel = $(`<div role="tabpanel" class="tab-pane" id="` + jobID + `">
                                 <div class="panel-body tab-content">
                                     <div role="tabpanel" class="tab-pane view_individual">
                                     </div>
@@ -207,14 +207,14 @@ plot = function() {
                              </div>`);
         thisResultPanel.appendTo('#result_panels');
         $('#viewControl a.active').tab('show');
-        var thisResultNavPage = $(`<li role="presentation" id="`+jobID+`_nav">
-                                    <a href="#`+jobID+`" role="tab" data-toggle="tab">Plotting...</a>
+        var thisResultNavPage = $(`<li role="presentation" id="` + jobID + `_nav">
+                                    <a href="#` + jobID + `" role="tab" data-toggle="tab">Plotting...</a>
                                 </li>`);
         thisResultNavPage.appendTo('#result_nav');
         $('a[href=".view_info"]').trigger('click'); //switch to message tab (i call it "view"). Use "click" instead of "tab show" to make sure styling works.
-        $('a', thisResultNavPage).trigger('click');//switch to this view now instantly. I didn't implement this at first because there was nothing to show, but now we have debug info to display.
+        $('a', thisResultNavPage).trigger('click'); //switch to this view now instantly. I didn't implement this at first because there was nothing to show, but now we have debug info to display.
         //Start listening to the server about how it gonna be doing:
-        var source = new EventSource("/stream?channel="+jobID);//See: http://flask-sse.readthedocs.io/en/latest/advanced.html#channels
+        var source = new EventSource("/stream?channel=" + jobID); //See: http://flask-sse.readthedocs.io/en/latest/advanced.html#channels
         serverEventListeners[jobID] = source;
         source.jobID = jobID;
         /*source.onopen = function() {
@@ -224,7 +224,7 @@ plot = function() {
             /*console.log(event.data);
             console.log(this);*/
             var data = JSON.parse(event.data);
-            var $infoPanel = $('#'+this.jobID+' > .panel-body > .view_info');
+            var $infoPanel = $('#' + this.jobID + ' > .panel-body > .view_info');
             $infoPanel.text($infoPanel.text() + data.data);
             $infoPanel.scrollTop($infoPanel.prop("scrollHeight"));
         };
@@ -238,92 +238,92 @@ plot = function() {
             success: function(data) {
                 console.log('Responsed:', data);
                 if (data.status == 'success') {
-                    $('#'+data.jobID+' > .panel-footer').html('Completed at <code>'+Date()+'</code>.');
-                    $('#'+data.jobID+' > .panel-body > .view_individual').append(data.plot_individual);
-                    $('#'+data.jobID+' > .panel-body > .view_combined').append(data.plot_combined);
-                    $('#'+data.jobID+'_nav > a').text('At ' + data.temperature.toString()+'K');
+                    $('#' + data.jobID + ' > .panel-footer').html('Completed at <code>' + Date() + '</code>.');
+                    $('#' + data.jobID + ' > .panel-body > .view_individual').append(data.plot_individual);
+                    $('#' + data.jobID + ' > .panel-body > .view_combined').append(data.plot_combined);
+                    $('#' + data.jobID + '_nav > a').text('At ' + data.temperature.toString() + 'K');
                     serverEventListeners[data.jobID].close();
                     $('a[href=".view_combined"]').trigger('click'); //switch to combined tab (i call it "view"). Use "click" instead of "tab show" to make sure styling works.
-                    console.log($('#'+data.jobID+' > .panel-body > .view_info').get())
-                    Prism.highlightElement($('#'+data.jobID+' > .panel-body > .view_info').get()[0]);
+                    console.log($('#' + data.jobID + ' > .panel-body > .view_info').get())
+                    Prism.highlightElement($('#' + data.jobID + ' > .panel-body > .view_info').get()[0]);
                     $btn.button('reset');
                 } else {
-                    $('#'+data.jobID+'_nav > a').text('Failed Job');
+                    $('#' + data.jobID + '_nav > a').text('Failed Job');
                     serverEventListeners[data.jobID].close();
-                    console.log($('#'+data.jobID+' > .panel-body > .view_info').get())
-                    Prism.highlightElement($('#'+data.jobID+' > .panel-body > .view_info').get()[0]);
+                    console.log($('#' + data.jobID + ' > .panel-body > .view_info').get())
+                    Prism.highlightElement($('#' + data.jobID + ' > .panel-body > .view_info').get()[0]);
                     $btn.button('reset');
                 };
             },
             error: function(xhr, ajaxOptions, thrownError) {
                 //This should seldomly happen. This is triggered nearly only when the connection fails.
-                $btn.button('reset');//On error do this
+                $btn.button('reset'); //On error do this
             }
         });
     };
 }
-cheat = function () {
+cheat = function() {
     var reversed_coefficient_dict = dict_reverse(puzzleData.coefficient_dict);
-    for (var i in puzzleData.coefficient_array) {//for each pre-set reaction:
+    for (var i in puzzleData.coefficient_array) { //for each pre-set reaction:
         var rxn = puzzleData.coefficient_array[i];
         //console.log(rxn);
-        var rxn_slots = ["","","",""];
+        var rxn_slots = ["", "", "", ""];
         for (var j in rxn) { //for each cofficient recorded in this particular reaction:
             var if_bad = false;
             var this_species = reversed_coefficient_dict[j];
             //console.log(this_species, rxn[j]);
-            if (rxn[j]==1) {
-                if (rxn_slots[0]=="") {
+            if (rxn[j] == 1) {
+                if (rxn_slots[0] == "") {
                     rxn_slots[0] = this_species;
-                } else if (rxn_slots[1]=="") { //first slot for reactant is occupied.
+                } else if (rxn_slots[1] == "") { //first slot for reactant is occupied.
                     rxn_slots[1] = this_species;
                 } else {
                     console.log('Too many reactants given.');
                     if_bad = true;
-                    break;//prevent even going into the next species/coefficient.
+                    break; //prevent even going into the next species/coefficient.
                 };
-            } else if (rxn[j]==2) {
-                if (rxn_slots[0]=="" && rxn_slots[1]=="") {
-                rxn_slots[0] = this_species;
-                rxn_slots[1] = this_species;
+            } else if (rxn[j] == 2) {
+                if (rxn_slots[0] == "" && rxn_slots[1] == "") {
+                    rxn_slots[0] = this_species;
+                    rxn_slots[1] = this_species;
                 } else {
                     console.log('Too many reactants given.');
                     if_bad = true;
-                    break;//prevent even going into the next species/coefficient.
+                    break; //prevent even going into the next species/coefficient.
                 };
-            } else if (rxn[j]==-1) {
-                if (rxn_slots[2]=="") {
+            } else if (rxn[j] == -1) {
+                if (rxn_slots[2] == "") {
                     rxn_slots[2] = this_species;
-                } else if (rxn_slots[3]=="") { //first slot for product is occupied.
+                } else if (rxn_slots[3] == "") { //first slot for product is occupied.
                     rxn_slots[3] = this_species;
                 } else {
                     console.log('Too many products given:', rxn_slots);
                     if_bad = true;
-                    break;//prevent even going into the next species/coefficient.
+                    break; //prevent even going into the next species/coefficient.
                 };
-            } else if (rxn[j]==-2) {
-                if (rxn_slots[2]=="" && rxn_slots[3]=="") {
-                rxn_slots[2] = this_species;
-                rxn_slots[3] = this_species;
+            } else if (rxn[j] == -2) {
+                if (rxn_slots[2] == "" && rxn_slots[3] == "") {
+                    rxn_slots[2] = this_species;
+                    rxn_slots[3] = this_species;
                 } else {
                     console.log('Too many products given.');
                     if_bad = true;
-                    break;//prevent even going into the next species/coefficient.
+                    break; //prevent even going into the next species/coefficient.
                 };
-            } else if (rxn[j]!=0) {
+            } else if (rxn[j] != 0) {
                 console.log('Bad coefficient recorded.');
                 if_bad = true;
-                break;//prevent even going into the next species/coefficient.
+                break; //prevent even going into the next species/coefficient.
             };
             //console.log(rxn_slots);
         }
         if (if_bad) {
             console.log('Error happened while parsing a coefficient. Skipping to next pre-recorded reaction.');
-            continue;//to next reaction
-        } else {//now write this reaction to table
+            continue; //to next reaction
+        } else { //now write this reaction to table
             addElementaryReaction();
             var selects = $('td > select', $('#elementaryReactionsTbody > tr').last());
-            for (i=0; i<4; i++) {
+            for (i = 0; i < 4; i++) {
                 $(selects[i]).val(rxn_slots[i]);
             }
             checkBalance($('#elementaryReactionsTbody > tr').last());
@@ -376,15 +376,15 @@ initializePuzzle = function(data) {
         evt.originalEvent.dataTransfer.setData("species", $(this).text().trim());
     });
 }
-viewControl = function (viewName) {
+viewControl = function(viewName) {
     $(this).toggleClass('active');
     $(this).data('target').toggle();
 }
 
 var sortableParams = {
-    ghostClass: "bg-info",  // Class name for the drop placeholder
-    chosenClass: "bg-primary",  // Class name for the chosen item
-    animation: 150  // ms, animation speed moving items when sorting, `0` — without animation
+    ghostClass: "bg-info", // Class name for the drop placeholder
+    chosenClass: "bg-primary", // Class name for the chosen item
+    animation: 150 // ms, animation speed moving items when sorting, `0` — without animation
 }
 $(function() {
     //Select Puzzle to load:
@@ -392,12 +392,12 @@ $(function() {
     //bind events:
     $('#addElementaryReaction').click(addElementaryReaction);
     $('#plotButton').click(plot);
-    Sortable.create(document.getElementById("elementaryReactionsTbody"),sortableParams);
-    Sortable.create(document.getElementById("conditionTbody"),sortableParams);
-    Sortable.create(document.getElementById("result_nav"),sortableParams);
+    Sortable.create(document.getElementById("elementaryReactionsTbody"), sortableParams);
+    Sortable.create(document.getElementById("conditionTbody"), sortableParams);
+    Sortable.create(document.getElementById("result_nav"), sortableParams);
     cheet('c h e a t', cheat);
     //for "Display result only in:"
-    $('[data-toggle="btns"] .btn').on('click', function(){
+    $('[data-toggle="btns"] .btn').on('click', function() {
         var $this = $(this);
         $this.parent().find('.active').removeClass('active');
         $this.addClass('active');
