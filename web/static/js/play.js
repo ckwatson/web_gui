@@ -36,6 +36,9 @@ print = function(content) {
 var emptyElementaryReaction = $(`
                     <tr class="elementaryReaction" draggable="true">
                         <td>
+                            <input type="checkbox" class="form-check-input" checked>
+                        </td>
+                        <td>
                             <select class="form-control">
                                 <option value=""></option>
                             </select>
@@ -65,11 +68,6 @@ var emptyElementaryReaction = $(`
                             </select>
                         </td>
                         <td>
-                            <!--<div class="checkbox">
-                                <label>
-                                    <input type="checkbox"> Disable
-                                </label>
-                            </div>-->
                             <button type="submit" class="btn btn-danger btn-sm removeReaction">
                                 Remove
                             </button>
