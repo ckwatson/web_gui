@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, jsonify, send_file#, redirect, url_for, send_from_directory
 from flask_sse import sse
-from flask.ext.compress import Compress
+from flask_compress import Compress
 #from .crossdomain import crossdomain
 from pprint import pprint
 ##relative import fix. according to this: http://stackoverflow.com/a/12869607/1147061

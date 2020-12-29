@@ -8,24 +8,13 @@ A Chemical Kinetics Simulator Game as a webapp, written in Python.
 Installation
 ------------
 
-###Install Python3 from [Official Website][].
+Assuming you have `conda` installed:
 
-Warning: Do not use `brew`, `pyenv` or `virtualenv`, since they will create a non-framework environment of Python, which is required by the `Matplotlib`. I know this pollutes the system environment, but sorry :(
-
-[Official Website]: https://www.python.org/downloads/
-
-####Append binary file directory of Pyhton3 to your PATH variable
-
-This allows auto detection of Python3 binaries.
-
-    $ echo 'export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/3.5/bin' >> ~/.bashrc 
-
-###Install requirements:
-
-    $ pip3 install -r requirements.txt
-    $ brew install redis
-
-the second line of which requires [Homebrew](http://brew.sh/). More info about Redis can be found [here](http://redis.io/).
+```
+conda create -n ckw --file conda-requirements.txt
+conda activate ckw
+pip install -r pip-requirements.txt
+```
 
 
 Run the server
