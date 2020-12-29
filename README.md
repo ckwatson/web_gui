@@ -17,12 +17,13 @@ pip install -r pip-requirements.txt
 
 ## Setup
 
-### The complete method
 Make sure you are in the correct conda env:
 
 ```shell
 conda activate ckw
 ```
+
+### With Redis and gunicorn
 
 In one terminal, do:
 
@@ -36,7 +37,8 @@ Then, in another terminal:
 gunicorn run:app --worker-class gevent --bind 127.0.0.1:80 --reload --timeout 6000
 ```
 
-### The short method
+### With Flask alone
+
 _Alternatively_, you can run the boot script directly:
 
 ```shell
@@ -49,12 +51,19 @@ This uses Flask itself to host the server, but would lose the ability to send [S
 
 ### Via Docker
 
+You can either run CKWatson as a single container or with Redis using Docker Compose.
+
+To run CKWatson as a single container:
 1. Build the image: `docker build -t ckw .`
 2. Start a container: `docker run -p 80:80 --rm --name ckwatson ckw`
+
+To run CKWatson with Redis, simply use `docker-compose up`.
+
 
 ### On Heroku
 
 Please use [this Buildpack](https://github.com/dmathieu/heroku-buildpack-submodules#installation) for Auto-Deployment Support on submodules.
+
 
 ## Folder Structure
 
