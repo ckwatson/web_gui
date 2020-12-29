@@ -1,0 +1,10 @@
+Flask-SSE==0.2.1
+Flask-Compress==1.4.0
+colored-traceback==0.3.0
+gunicorn==20.0.4
+gevent==20.12.1
+flask==1.1.2
+matplotlib==3.3.2
+scipy==1.5.2
+jsonschema==3.2.0
+colorlog==4.6.2

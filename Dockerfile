@@ -1,7 +1,7 @@
-FROM continuumio/miniconda3:4.9.2-alpine
+FROM python:3.8-slim
 MAINTAINER tslmy
 COPY . ~/
 WORKDIR ~/
-RUN conda config --add channels conda-forge && conda install -y --file conda-requirements.txt && pip install -r pip-requirements.txt
+RUN pip install -r requirements.txt
 EXPOSE 80
 CMD gunicorn run:app --worker-class gevent --bind 0.0.0.0:80
