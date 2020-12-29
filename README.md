@@ -33,7 +33,7 @@ redis-server
 Then, in another terminal:
 
 ```shell
-sudo /Library/Frameworks/Python.framework/Versions/3.5/bin/gunicorn run:app --worker-class gevent --bind 127.0.0.1:80 --reload --timeout 6000
+gunicorn run:app --worker-class gevent --bind 127.0.0.1:80 --reload --timeout 6000
 ```
 
 ### The short method
@@ -45,7 +45,14 @@ sudo run.py
 
 This uses Flask itself to host the server, but would lose the ability to send [Server-Sent Events](https://github.com/singingwolfboy/flask-sse).
 
-## Deployment (Heroku)
+## Deployment
+
+### Via Docker
+
+1. Build the image: `docker build -t ckw .`
+2. Start a container: `docker run -p 80:80 --rm --name ckwatson ckw`
+
+### On Heroku
 
 Please use [this Buildpack](https://github.com/dmathieu/heroku-buildpack-submodules#installation) for Auto-Deployment Support on submodules.
 
