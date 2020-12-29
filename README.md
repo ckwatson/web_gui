@@ -10,7 +10,7 @@ A Chemical Kinetics Simulator Game as a webapp, written in Python.
 Assuming you have `conda` installed:
 
 ```shell
-conda create -n ckw python=3.8
+conda create -n ckw python=3.7.6
 conda activate ckw
 pip install -r requirements.txt
 ```
