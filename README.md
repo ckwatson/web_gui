@@ -3,7 +3,7 @@ CKWatson Online
 
 A Chemical Kinetics Simulator Game as a webapp, written in Python.
 
-[Screenshot](http://i.imgur.com/UVizS1S.png)
+![Screenshot](http://i.imgur.com/UVizS1S.png)
 
 ## Installation
 
@@ -15,8 +15,7 @@ conda activate ckw
 pip install -r pip-requirements.txt
 ```
 
-
-## Installation
+## Setup
 
 ### The complete method
 Make sure you are in the correct conda env:
