@@ -143,8 +143,8 @@
         {% endif %}
         <script>
         var puzzleName = "{{ puzzleName }}";
-        var ip = "{{ ip }}"; { % if mode == "play" % }
-        var puzzleData = { { puzzleData | safe } }; { % endif % }
+        var ip = "{{ ip }}"; {% if mode == "play" %}
+        var puzzleData = {{ puzzleData | safe }}; {% endif %}
         </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.5.2/validator.min.js" integrity="sha512-vZEoK8xRncku4g5GANHh5zobUjeCMbZkSEahrADeAcRlk/1Ignf8sAKojkV4RZLkPw145+ILJFisI2pnjsPtGQ==" crossorigin="anonymous"></script>
