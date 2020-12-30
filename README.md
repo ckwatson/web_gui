@@ -10,7 +10,7 @@ A Chemical Kinetics Simulator Game as a webapp, written in Python.
 Assuming you have `conda` installed:
 
 ```shell
-conda create -n ckw python=3.9.1
+conda create -n ckw python=3.8
 conda activate ckw
 pip install -r requirements.txt
 ```
@@ -59,6 +59,22 @@ To run CKWatson as a single container:
 
 To run CKWatson with Redis, simply use `docker-compose up`.
 
+### Via Kubernetes
+
+I will be using [minikube](https://minikube.sigs.k8s.io/) in this walkthrough. I will be using the local Docker Registry as the source of the Kubenetes image.
+
+```shell
+# Start the cluster:
+minikube start
+# Register the Docker Registry to minikube -- This is because we will be building the image from the Dockerfile for Kubenetes:
+eval $(minikube docker-env)
+# Build the Docker image for Kubenetes:
+docker build -t ckw .
+# Apply the Deployment (which manages the Pods/"virtual hosts" in the minikube cluster for the app) as well as the Service (which is a Load Balancer in this case that exposes the web app in the Pods) using the manifest file:
+kubectl apply -f kubernetes-manifest.yml
+# Access the web app:
+minikube service web
+```
 
 ### On Heroku
 
