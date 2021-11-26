@@ -94,9 +94,7 @@ logger = logging.getLogger(__name__)
 
 def np_err_handler(message, flag):
     logger.error(
-        "NumPy floating-point error: "
-        + message
-        + "\n"
+        f"NumPy floating-point error: {message}\n"
         + "".join(traceback.format_stack(limit=7)[:-1])
     )
 
@@ -137,13 +135,13 @@ def plot():
     # now the serious part:
     try:
         # prepare directories:
-        path_puzzle = path_root + data["puzzle"] + "/"
-        path_condition = path_puzzle + "condition_" + data["conditionID"] + "/"
-        path_solution = path_condition + "solution_" + data["solutionID"] + "/"
+        path_puzzle = f"{path_root}{data['puzzle']}/"
+        path_condition = f"{path_puzzle}condition_{data['conditionID']}/"
+        path_solution = f"{path_condition}solution_{data['solutionID']}/"
         # prepare figure file_names:
-        plot_name = path_solution + "/" + str(data["temperature"])
-        plot_individual_filename = plot_name + "_individual.svg"
-        plot_combined_filename = plot_name + "_combined.svg"
+        plot_name = path_solution + f"/{data['temperature']}"
+        plot_individual_filename = f"{plot_name}_individual.svg"
+        plot_combined_filename = f"{plot_name}_combined.svg"
         # try whether result already generated:
         if (
             os.path.isfile(plot_individual_filename)
@@ -166,7 +164,7 @@ def plot():
                 os.makedirs(path_solution)
             # Now start preparing the instances of custom classes for further actual use in Engine.Driver:
             #    (0) First of all, load the Puzzle Data into backend:
-            with open("puzzles/" + data["puzzle"] + ".puz") as json_file:
+            with open(f"puzzles/{data['puzzle']}.puz") as json_file:
                 puzzleData = json.load(json_file)
                 logger.info("    (0) Successfully loaded Puzzle Data from file!")
             #    (1) Instance of the Puzzle class:
@@ -191,24 +189,13 @@ def plot():
                 ]
                 if preEqulElemRxns == []:
                     logger.info(
-                        "        For the reagent #"
-                        + str(reagentID)
-                        + ' "'
-                        + reagent
-                        + '", no pre-equilibration needed.'
+                        f'        For the reagent #{reagentID} "{reagent}", no pre-equilibration needed.'
                     )
                     preEqulElemRxns = np.array([[0.0]], dtype=float)
                     reagent_speciesList = [reagent]
                 else:
                     # convert it into a numpy dict
                     preEqulElemRxns = np.array(preEqulElemRxns, dtype=float)
-                    logger.info(
-                        "        For the reagent #"
-                        + str(reagentID)
-                        + ' "'
-                        + reagent
-                        + '", the following reactions present: //omitted//'
-                    )  # \n',preEqulElemRxns)
                     # a boolean array of whether each species specified in the puzzle file is present in this set of ElemRxns for preEqul.
                     if_uninvolvedSpecies = np.all(preEqulElemRxns == False, axis=0)
                     # now, remove unused species to simplify the rxn. set used for pre-equilibration of this particular reagent:
@@ -222,9 +209,9 @@ def plot():
                                 preEqulElemRxns, speciesID - displacement, 1
                             )
                             displacement += 1
-                    logger.info("            speciesList         : " + str(speciesList))
+                    logger.info(f"            speciesList         : {speciesList}")
                     logger.info(
-                        "            if_uninvolvedSpecies: " + str(if_uninvolvedSpecies)
+                        f"            if_uninvolvedSpecies: {if_uninvolvedSpecies}"
                     )
                     # \n',preEqulElemRxns)
                     logger.info(
@@ -239,16 +226,11 @@ def plot():
                 reagent_num_mol = len(reagent_speciesList)
                 logger.info("            About pre-equilibration:")
                 logger.info(
-                    "                Elem. Rxn.s used for pre-equilibration (a total of "
-                    + str(reagent_num_rxn)
-                    + "): \n                    "
-                    + str(preEqulElemRxns)
+                    f"                Elem. Rxn.s used for pre-equilibration (a total of {reagent_num_rxn}): \n"
+                    + f"                    {preEqulElemRxns}"
                 )
                 logger.info(
-                    "                which involves "
-                    + str(reagent_num_mol)
-                    + " species: "
-                    + str(reagent_speciesList)
+                    f"                which involves {reagent_num_mol} species: {reagent_speciesList}"
                 )
                 reagentsDict.append(
                     (
@@ -310,7 +292,7 @@ def plot():
             logger.info("    (4) Simulating...")
             logger.info("         (a) True Model first:")
             # anticipate the file name where the true model's data is stored
-            trueModel_fileName = path_condition + "plotData_t_" + str(temperature)
+            trueModel_fileName = f"{path_condition}plotData_t_{temperature}"
             if os.path.isfile(trueModel_fileName + "_.dat") and if_useCache:
                 # Mechanism(true)+Condition for this puzzle already simulated before. Take advantage of the cache now...")
                 logger.info(" cache available. Load from it.")
@@ -327,13 +309,11 @@ def plot():
                     progress_tick=lambda x: 0,
                 )
                 logger.info(
-                    "            Got result in a type of "
-                    + str(type(written_true_data))
-                    + "."
+                    f"            Got result in a type of {type(written_true_data)}."
                 )
             logger.info("         (b) User Model then:")
             # anticipate the file name where the true model's data is stored
-            userModel_fileName = path_solution + "plotData_t_" + str(temperature)
+            userModel_fileName = f"{path_solution}plotData_t_{temperature}"
             if (
                 os.path.isfile(userModel_fileName + "_.dat")
                 or os.path.isfile(userModel_fileName + "_Failed")
@@ -363,22 +343,14 @@ def plot():
                     written_true_data=written_true_data,
                 )
                 logger.info(
-                    "             Got result in a type of "
-                    + str(type(written_user_data))
-                    + "."
+                    f"             Got result in a type of {type(written_user_data)}."
                 )
             logger.info("    (5) Drawing plots... ")
             (plot_individual, plot_combined) = driver.plotter.sub_plots(
                 Temperature=temperature,
                 plottingDict=puzzleData["coefficient_dict"],
-                solution_fileName=path_solution
-                + "/"
-                + "plotData_t_"
-                + str(temperature),
-                condition_fileName=path_condition
-                + "/"
-                + "plotData_t_"
-                + str(temperature),
+                solution_fileName=f"{path_solution}plotData_t_{temperature}",
+                condition_fileName=f"{path_condition}plotData_t_{temperature}",
                 written_true_data=written_true_data,
                 written_user_data=written_user_data,
             )
@@ -398,7 +370,7 @@ def plot():
             _thread.start_new_thread(
                 fileIO.save_figure, (plot_combined, plot_combined_filename)
             )
-            logger.info("Executed for " + str(time.time() - startTime) + "s.")
+            logger.info(f"Executed for {time.time() - startTime}s.")
             # so that the client won't be getting debug info from other instances.
             logger.removeHandler(logging_handler)
             # ongoingJobs.remove(data['jobID'])
@@ -412,7 +384,7 @@ def plot():
     except Exception as error:
         # print out last words:
         logger.error(traceback.format_exc())
-        logger.info("Executed for " + str(time.time() - startTime) + "s.")
+        logger.info(f"Executed for {time.time() - startTime}s.")
         # now unbind all log-handlers, so that the logger won't waste its time sending messages to this audience in later calls.
         # redirect the logs since NOW
         rootLogger.removeHandler(logging_handler)
@@ -441,26 +413,16 @@ def save():
         return jsonify(status="danger", message=e.message)
     else:
         # now convert:
-        coefficient_dict = {
+        species_name_to_id = {
             species: i for i, species in enumerate(data["speciesNames"])
         }
-        coefficient_array = []
-        for row in data["reactions"]:
-            coefficient_array.append([0.0] * len(coefficient_dict))
-            for i in range(4):
-                speciesName = row[i]
-                if speciesName == "":
-                    continue  # skip empty entries
-                else:
-                    # use coefficient_dict that we just built to convert speciesList from name strings to numberial ids
-                    speciesID = coefficient_dict[speciesName]
-                    if i == 0 or i == 1:  # reactant
-                        coefficient_array[-1][speciesID] -= 1
-                    elif i == 2 or i == 3:  # product
-                        coefficient_array[-1][speciesID] += 1
+        coefficient_array = convert_reactions_to_coeffcients(
+            reactions, species_name_to_id
+        )
+        energies = dict(zip(data["speciesNames"], data["speciesEnergies"]))
         data_to_write = {
             "coefficient_dict": coefficient_dict,
-            "energy_dict": dict(zip(data["speciesNames"], data["speciesEnergies"])),
+            "energy_dict": energies,
             "coefficient_array": coefficient_array,
             "reagents": list(data["reagentPERs"].keys()),
             "reagentPERs": data["reagentPERs"],
@@ -475,6 +437,20 @@ def save():
                 return jsonify(status="danger", message="Error occured. Can't save.")
             else:
                 return jsonify(status="success", message="Puzzle successfully saved.")
+
+
+def convert_reactions_to_coeffcients(reactions, species_name_to_id):
+    matrix = []
+    for reaction in data["reactions"]:
+        coefficients = [0.0] * len(species_name_to_id)
+        for i, speciesName in enumerate(reaction):
+            if speciesName == "":
+                continue  # skip empty entries
+            speciesID = species_name_to_id[speciesName]
+            delta = 1 if i > 1 else -1
+            coefficients[speciesID] += delta
+        matrix.append(coefficients)
+    return matrix
 
 
 @app.route("/create")
