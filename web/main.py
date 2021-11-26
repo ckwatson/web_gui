@@ -1,19 +1,6 @@
 #!/usr/local/bin/python3.5
 # , redirect, url_for, send_from_directory
 # from .crossdomain import crossdomain
-from pprint import pprint
-
-from flask import Flask, jsonify, render_template, request, send_file
-from flask_compress import Compress
-from flask_sse import sse
-
-# relative import fix. according to this: http://stackoverflow.com/a/12869607/1147061
-# import sys
-# sys.path.append('..')
-from kernel.engine import driver, fileIO
-
-driver.temp_diag = False
-driver.system_output = pprint
 import _thread
 import hashlib
 import json
@@ -23,11 +10,15 @@ import os
 import sys
 import time
 import traceback
+from pprint import pprint
 
 import colored_traceback.auto
 import colorlog
 import jsonschema
 import numpy as np
+from flask import Flask, jsonify, render_template, request, send_file
+from flask_compress import Compress
+from flask_sse import sse
 
 from kernel.data import (
     condition_class,
@@ -36,16 +27,30 @@ from kernel.data import (
     solution_class,
 )
 
+# relative import fix. according to this: http://stackoverflow.com/a/12869607/1147061
+# import sys
+# sys.path.append('..')
+from kernel.engine import driver, fileIO
+
+driver.temp_diag = False
+driver.system_output = pprint
+
+
 np.seterr(all="warn")
 
-# one-liners:
-all_files_in = lambda mypath, end="": [
-    os.path.splitext(os.path.basename(f))[0]
-    for f in os.listdir(mypath)
-    if os.path.isfile(os.path.join(mypath, f))
-    and not f.startswith(".")
-    and f.endswith(end)
-]
+
+def all_files_in(mypath, end=""):
+    files = []
+    for f in os.listdir(mypath):
+        if (
+            os.path.isfile(os.path.join(mypath, f))
+            and not f.startswith(".")
+            and f.endswith(end)
+        ):
+            name = os.path.splitext(os.path.basename(f))[0]
+            files.append(name)
+    return files
+
 
 # For Server-Sent-Event support:
 
