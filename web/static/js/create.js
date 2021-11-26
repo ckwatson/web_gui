@@ -360,7 +360,7 @@ var sortableParams = {
     animation: 150 // ms, animation speed moving items when sorting, `0` — without animation
 }
 removeSpecies = function(speciesName) {
-    //remove the row of this molecule from the sidebar 
+    //remove the row of this molecule from the sidebar
     $('.species#' + speciesName).remove();
 }
 allSpeciesInvolvedInReactions = function() {

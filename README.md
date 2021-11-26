@@ -74,7 +74,7 @@ eval $(minikube docker-env)
 # Build the Docker image for Kubenetes:
 docker build -t ckw .
 # Apply the Deployment (which manages the Pods/"virtual hosts" in the minikube cluster for the app) as well as the Service (which is a Load Balancer in this case that exposes the web app in the Pods) using the manifest file:
-kubectl apply -f kubernetes-manifest.yml
+kubectl apply -f ./k8s
 # Access the web app:
 minikube service web
 ```
