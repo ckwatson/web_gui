@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  labels:
+    app: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.22.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        app: web
+    spec:
+      containers:
+        - env:
+            - name: REDIS_URL
+              value: redis://redis.default.svc.cluster.local
+          image: ckw:latest
+          imagePullPolicy: Never # required since we are using a local Docker registry
+          name: web
+          ports:
+            - containerPort: 80
+      restartPolicy: Always
+status: {}
