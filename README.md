@@ -10,6 +10,9 @@ A Chemical Kinetics Simulator Game as a webapp, written in Python.
 Assuming you have `conda` installed:
 
 ```shell
+git clone https://github.com/ckwatson/web_gui.git
+cd web_gui
+git submodule update --init --recursive
 conda create -n ckw python=3.8
 conda activate ckw
 pip install -r requirements.txt
