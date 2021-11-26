@@ -7,13 +7,13 @@ A Chemical Kinetics Simulator Game as a webapp, written in Python.
 
 ## Installation
 
-Assuming you have `conda` installed:
+Assuming you use `mambaforge` as your environment manager:
 
 ```shell
 git clone https://github.com/ckwatson/web_gui.git
 cd web_gui
 git submodule update --init --recursive
-conda create -n ckw python=3.8
+mamba create -n ckw python=3.8 redis=5.0.3 -y
 conda activate ckw
 pip install -r requirements.txt
 ```
@@ -26,29 +26,16 @@ Make sure you are in the correct conda env:
 conda activate ckw
 ```
 
-### With Redis and gunicorn
+To run CKWatson with Redis and gunicorn:
 
-In one terminal, do:
+1. In one terminal, execute `redis-server`.
+2. Then, in another terminal: `gunicorn run:app --worker-class gevent --bind 127.0.0.1:80 --reload --timeout 6000`
 
-```shell
-redis-server
-```
-
-Then, in another terminal:
-
-```shell
-gunicorn run:app --worker-class gevent --bind 127.0.0.1:80 --reload --timeout 6000
-```
-
-### With Flask alone
-
-_Alternatively_, you can run the boot script directly:
-
-```shell
-sudo run.py
-```
+_Alternatively_, you can run the boot script directly: `run.py`
 
 This uses Flask itself to host the server, but would lose the ability to send [Server-Sent Events](https://github.com/singingwolfboy/flask-sse).
+
+Either way, if the program encounters problems binding to the port `80`, try `sudo`. 
 
 ## Deployment
 
