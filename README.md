@@ -1,5 +1,8 @@
 CKWatson Online
 ===============
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 A Chemical Kinetics Simulator Game as a webapp, written in Python.
 
@@ -35,7 +38,7 @@ _Alternatively_, you can run the boot script directly: `run.py`
 
 This uses Flask itself to host the server, but would lose the ability to send [Server-Sent Events](https://github.com/singingwolfboy/flask-sse).
 
-Either way, if the program encounters problems binding to the port `80`, try `sudo`. 
+Either way, if the program encounters problems binding to the port `80`, try `sudo`.
 
 ## Deployment
 
