@@ -75,7 +75,6 @@ const emptyElementaryReaction = $(`
                         </td>
                     </tr>
 `)
-let puzzleData
 const hasEmptyElementaryReaction = true
 // functions for checking mass balances of elementary reactions:
 checkOverallBalance = function () {
