@@ -1,2 +1,23 @@
+[project]
+name = "web_gui"
+version = "0.1.0"
+description = "Web GUI for CKWatson."
+requires-python = ">=3.10"
+dependencies = [
+    "flask-sse~=0.2.1",
+    "flask-compress~=1.4.0",
+    "colored-traceback~=0.3.0",
+    "gunicorn~=20.0.4",
+    "gevent~=25.5.1",
+    "flask~=3.1.1",
+    "matplotlib~=3.7.0",
+    "scipy~=1.8.0",
+    "jsonschema~=3.2.0",
+    "colorlog~=4.6.2",
+    "jinja2>=2.11.3",
+    "markupsafe>=3.0.2",
+]
+
 [tool.isort]
 profile = "black"
+

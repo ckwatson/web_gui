@@ -3,6 +3,7 @@ CKWatson Online
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 
 A Chemical Kinetics Simulator Game as a webapp, written in Python.
 
@@ -10,31 +11,21 @@ A Chemical Kinetics Simulator Game as a webapp, written in Python.
 
 ## Installation
 
-Assuming you use `mambaforge` as your environment manager:
-
 ```shell
 git clone https://github.com/ckwatson/web_gui.git
 cd web_gui
 git submodule update --init --recursive
-mamba create -n ckw python=3.8 redis=5.0.3 -y
-conda activate ckw
-pip install -r requirements.txt
+uv sync
 ```
 
 ## Setup
 
-Make sure you are in the correct conda env:
-
-```shell
-conda activate ckw
-```
-
 To run CKWatson with Redis and gunicorn:
 
 1. In one terminal, execute `redis-server`.
-2. Then, in another terminal: `gunicorn run:app --worker-class gevent --bind 127.0.0.1:80 --reload --timeout 6000`
+2. Then, in another terminal: `uv run gunicorn run:app --worker-class gevent --bind 127.0.0.1:80 --reload --timeout 6000`
 
-_Alternatively_, you can run the boot script directly: `run.py`
+_Alternatively_, you can run the boot script directly: `uv run run.py`.
 
 This uses Flask itself to host the server, but would lose the ability to send [Server-Sent Events](https://github.com/singingwolfboy/flask-sse).
 

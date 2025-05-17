@@ -1,7 +1,7 @@
-FROM python:3.8-slim
+FROM 0.7.5-python3.10-bookworm
 MAINTAINER tslmy
-COPY . ~/
-WORKDIR ~/
-RUN pip install -r requirements.txt
+WORKDIR /app
+COPY . .
+RUN uv sync
 EXPOSE 80
-CMD gunicorn run:app --worker-class gevent --bind 0.0.0.0:80
+CMD uv run gunicorn run:app --worker-class gevent --bind 0.0.0.0:80
