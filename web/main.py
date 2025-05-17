@@ -417,8 +417,13 @@ def save():
             species: i for i, species in enumerate(data["speciesNames"])
         }
         coefficient_array = convert_reactions_to_coeffcients(
-            reactions, species_name_to_id
+            data["reactions"], species_name_to_id
         )
+        coefficient_dict = {
+            # TODO: This is AI-generated. Check this.
+            species: i
+            for i, species in enumerate(data["speciesNames"])
+        }
         energies = dict(zip(data["speciesNames"], data["speciesEnergies"]))
         data_to_write = {
             "coefficient_dict": coefficient_dict,
@@ -441,7 +446,7 @@ def save():
 
 def convert_reactions_to_coeffcients(reactions, species_name_to_id):
     matrix = []
-    for reaction in data["reactions"]:
+    for reaction in reactions:
         coefficients = [0.0] * len(species_name_to_id)
         for i, speciesName in enumerate(reaction):
             if speciesName == "":
