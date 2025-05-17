@@ -23,13 +23,11 @@ uv sync
 To run CKWatson with Redis and gunicorn:
 
 1. In one terminal, execute `redis-server`.
-2. Then, in another terminal: `uv run gunicorn run:app --worker-class gevent --bind 127.0.0.1:80 --reload --timeout 6000`
+2. Then, in another terminal: `just run`.
 
 _Alternatively_, you can run the boot script directly: `uv run run.py`.
 
 This uses Flask itself to host the server, but would lose the ability to send [Server-Sent Events](https://github.com/singingwolfboy/flask-sse).
-
-Either way, if the program encounters problems binding to the port `80`, try `sudo`.
 
 ## Deployment
 
