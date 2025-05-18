@@ -25,16 +25,7 @@ from kernel.data import (
     reaction_mechanism_class,
     solution_class,
 )
-
-# relative import fix. according to this: http://stackoverflow.com/a/12869607/1147061
-# import sys
-# sys.path.append('..')
-from kernel.engine import driver, fileIO, plotter
-
-driver.temp_diag = False
-# TODO: Right now all usages of `system_output` in `driver` are commented out.
-# driver.system_output = pprint
-
+from kernel.engine import fileIO, plotter
 
 np.seterr(all="warn")
 
@@ -111,9 +102,9 @@ def handle_plot_request():
     startTime = time.time()  # start timer
     data = request.get_json()  # receive JSON data
     # initialize logger for this particular job:
-    # create a log_handler that streams messages to the web UI specificially for this job.
+    # create a log_handler that streams messages to the web UI specifically for this job.
     logging_handler = logging.StreamHandler(stream=ListStream(data["jobID"]))
-    logger = logging.getLogger("handle_plot_request")
+    logger = logging.getLogger("handle_plot_request").getChild(data["jobID"])
     logger.addHandler(logging_handler)  # redirect the logs since NOW
     # now the serious part:
     try:
@@ -157,7 +148,6 @@ def handle_plot_request():
 def simulate_experiments_and_plot(
     data: Dict,
     puzzleData: Dict,
-    logger: logging.Logger,
     path_condition: str,
     path_solution: str,
     plot_combined_filename: str,
@@ -167,6 +157,7 @@ def simulate_experiments_and_plot(
     """
     Simulate the puzzle and draw plots.
     """
+    logger = logging.getLogger("simulate_experiments_and_plot").getChild(data["jobID"])
     logger.info("================== RECEIVED PLOTTING JOB ==================")
     # we check the deepest folder, which implies all parent-grandparent folders exist.
     if not os.path.isdir(path_solution):
@@ -337,7 +328,6 @@ def simulate_experiments_and_plot(
     threading.Thread(
         target=fileIO.save_figure, args=(plot_combined, plot_combined_filename)
     ).start()
-    # ongoingJobs.remove(data['jobID'])
     return plot_combined, plot_individual
 
 
