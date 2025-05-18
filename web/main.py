@@ -160,7 +160,7 @@ def handle_plot_request():
             with open(f"puzzles/{data['puzzle']}.puz") as json_file:
                 puzzleData = json.load(json_file)
                 logger.info("    (0) Successfully loaded Puzzle Data from file!")
-            plot_combined, plot_individual = plot(
+            plot_combined, plot_individual = simulate_experiments_and_plot(
                 data,
                 puzzleData,
                 logger,
@@ -185,7 +185,7 @@ def handle_plot_request():
         return jsonify(jobID=data["jobID"], status="error")
 
 
-def plot(
+def simulate_experiments_and_plot(
     data: Dict,
     puzzleData: Dict,
     logger: logging.Logger,
