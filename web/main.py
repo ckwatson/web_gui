@@ -1,13 +1,14 @@
 #!/usr/local/bin/python3.5
 # , redirect, url_for, send_from_directory
 # from .crossdomain import crossdomain
-import _thread
+
 import hashlib
 import json
 import logging
 import mimetypes
 import os
 import sys
+import threading
 import time
 import traceback
 from pprint import pprint
@@ -385,18 +386,18 @@ def plot(
     logger.info(
         "    (6) Now that everything is finished, write simulated data to file for caching..."
     )
-    _thread.start_new_thread(
-        fileIO.save_modelData, (written_true_data, trueModel_fileName)
-    )
-    _thread.start_new_thread(
-        fileIO.save_modelData, (written_user_data, userModel_fileName)
-    )
-    _thread.start_new_thread(
-        fileIO.save_figure, (plot_individual, plot_individual_filename)
-    )
-    _thread.start_new_thread(
-        fileIO.save_figure, (plot_combined, plot_combined_filename)
-    )
+    threading.Thread(
+        target=fileIO.save_modelData, args=(written_true_data, trueModel_fileName)
+    ).start()
+    threading.Thread(
+        target=fileIO.save_modelData, args=(written_user_data, userModel_fileName)
+    ).start()
+    threading.Thread(
+        target=fileIO.save_figure, args=(plot_individual, plot_individual_filename)
+    ).start()
+    threading.Thread(
+        target=fileIO.save_figure, args=(plot_combined, plot_combined_filename)
+    ).start()
     # ongoingJobs.remove(data['jobID'])
     return plot_combined, plot_individual
 
