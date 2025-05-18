@@ -10,6 +10,7 @@ import sys
 import threading
 import time
 import traceback
+import uuid
 from pprint import pprint
 from typing import Dict, Optional, Tuple
 
@@ -106,8 +107,10 @@ def handle_plot_request():
     # initialize logger for this particular job:
     # create a log_handler that streams messages to the web UI specifically for this job.
     logging_handler = logging.StreamHandler(stream=ListStream(data["jobID"]))
-    logger = logging.getLogger("handle_plot_request").getChild(data["jobID"])
-    logger.addHandler(logging_handler)  # redirect the logs since NOW
+    job_logger = logging.getLogger(data["jobID"])
+    job_logger.addHandler(logging_handler)  # redirect the logs since NOW
+    # All functions should have their own logger that is a child of the job_logger.
+    logger = job_logger.getChild("handle_plot_request")
     # now the serious part:
     try:
         # prepare directories:
@@ -164,7 +167,7 @@ def simulate_experiments_and_plot(
     """
     Simulate the puzzle and draw plots.
     """
-    logger = logging.getLogger("simulate_experiments_and_plot").getChild(data["jobID"])
+    logger = logging.getLogger(data["jobID"]).getChild("simulate_experiments_and_plot")
     logger.info("================== RECEIVED PLOTTING JOB ==================")
     # we check the deepest folder, which implies all parent-grandparent folders exist.
     if not os.path.isdir(path_solution):
@@ -297,7 +300,7 @@ def simulate_experiments_and_plot(
     # Mechanism(true)+Condition for this puzzle not calculated before; do it now...")
     logger.info("             simulating...")
     # if we are simulating the true_model then solution argument is none
-    written_true_data = run_true_experiment(this_puzzle, this_condition)
+    written_true_data = run_true_experiment(data["jobID"], this_puzzle, this_condition)
     logger.info(f"            Got result in a type of {type(written_true_data)}.")
     logger.info("         (b) User Model then:")
     written_user_data: Optional[np.ndarray] = None
@@ -308,7 +311,7 @@ def simulate_experiments_and_plot(
     logger.info("             simulating...")
     # if we are simulating the true_model then solution argument is none
     written_user_data = run_proposed_experiment(
-        this_condition, path_condition, this_solution, written_true_data
+        data["jobID"], this_condition, path_condition, this_solution, written_true_data
     )
     if written_user_data is None:
         logger.error("             The model you proposed failed.")
