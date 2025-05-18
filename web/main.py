@@ -192,8 +192,6 @@ def simulate_experiments_and_plot(
         ],
         Ea=puzzle_definition["transition_state_energies"],
     )
-    #                                 num_rxn, num_mol, species_list, elementary_reactions, energy_dict -> fed to class "reaction_mechanism"
-    #                                                                                                        reagents_dict, Ea -> fed to class puzzle
     logger.info("    (1) Puzzle Instance successfully created.")
     #    (2) Instance of the Condition class:
     # rxn_temp = temperature
