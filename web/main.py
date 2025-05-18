@@ -429,7 +429,7 @@ def save():
         species_name_to_id = {
             species: i for i, species in enumerate(data["speciesNames"])
         }
-        coefficient_array = convert_reactions_to_coeffcients(
+        coefficient_array = convert_reactions_to_coefficients(
             data["reactions"], species_name_to_id
         )
         coefficient_dict = {
@@ -457,7 +457,7 @@ def save():
                 return jsonify(status="success", message="Puzzle successfully saved.")
 
 
-def convert_reactions_to_coeffcients(reactions, species_name_to_id):
+def convert_reactions_to_coefficients(reactions, species_name_to_id):
     matrix = []
     for reaction in reactions:
         coefficients = [0.0] * len(species_name_to_id)
