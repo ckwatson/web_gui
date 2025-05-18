@@ -337,7 +337,7 @@ def simulate_experiments_and_plot(
             )
     else:
         # Mechanism(true)+Condition for this puzzle not calculated before; do it now...")
-        logger.info(" simulating...")
+        logger.info("             simulating...")
         # if we are simulating the true_model then solution argument is none
         written_true_data = run_true_experiment(this_puzzle, this_condition)
         logger.info(f"            Got result in a type of {type(written_true_data)}.")
@@ -363,13 +363,13 @@ def simulate_experiments_and_plot(
             logger.info(" UserModel failed as told by flag file.")
     else:
         # Mechanism(solution)+Condition for this puzzle not calculated before; do it now...")
-        logger.info(" simulating...")
+        logger.info("             simulating...")
         # if we are simulating the true_model then solution argument is none
         written_user_data = run_proposed_experiment(
             this_condition, path_condition, this_solution, written_true_data
         )
         if written_user_data is None:
-            logger.error("The model you proposed failed.")
+            logger.error("             The model you proposed failed.")
 
     logger.info("    (5) Drawing plots... ")
     (plot_individual, plot_combined) = plotter.sub_plots(
