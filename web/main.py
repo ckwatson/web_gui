@@ -25,7 +25,6 @@ from kernel.data import (
     reaction_mechanism_class,
     solution_class,
 )
-from kernel.data.condition_class import condition
 
 # relative import fix. according to this: http://stackoverflow.com/a/12869607/1147061
 # import sys
@@ -298,7 +297,7 @@ def plot(
     r_temps = [reactant["temperature"] for reactant in data["conditions"]]
     m_concs = [0.0] * num_mol
     #         - - - - - - - - - - - - - - -
-    this_condition: condition = condition_class.condition(
+    this_condition: condition_class.condition = condition_class.condition(
         temperature, speciesList, r_names, r_temps, r_concs, m_concs
     )
     logger.info("    (2) Condition Instance successfully created.")
