@@ -7,10 +7,9 @@ import json
 import logging
 import os
 import sys
-import threading
 import traceback
 from pprint import pprint
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import colorlog
 import humanize
@@ -19,6 +18,7 @@ import numpy as np
 from flask import Flask, jsonify, render_template, request
 from flask_compress import Compress
 from flask_sse import sse
+from numpy._typing import NDArray
 
 from kernel.data import (
     condition_class,
@@ -26,7 +26,7 @@ from kernel.data import (
     reaction_mechanism_class,
     solution_class,
 )
-from kernel.engine import fileIO, plotter
+from kernel.engine import plotter
 
 np.seterr(all="warn")
 
@@ -151,95 +151,49 @@ def simulate_experiments_and_plot(
     Simulate the puzzle and draw plots.
     """
     logger = logging.getLogger(data["jobID"]).getChild("simulate_experiments_and_plot")
-    logger.info("================== RECEIVED PLOTTING JOB ==================")
     # Now start preparing the instances of custom classes for further actual use in Engine.Driver:
-
     #    (1) Instance of the Puzzle class:
     #           (1.1) general data:
     elementary_reactions = np.array(puzzle_definition["coefficient_array"], dtype=float)
     energy_dict = puzzle_definition["energy_dict"]
-    Ea = None  # puzzleData['transition_state_energies']
-    # logger.info('        SpeciesList involved are:',' '.join(speciesList))
-    speciesList = sorted(
+    # `coefficient_dict` maps species names to their indices in the coefficient array.
+    species_list = sorted(
         puzzle_definition["coefficient_dict"],
         key=puzzle_definition["coefficient_dict"].get,
     )
     num_rxn = len(puzzle_definition["coefficient_array"])
-    num_mol = len(speciesList)
+    num_mol = len(species_list)
+    logger.info(
+        "        %i species are involved. They are: %s", num_mol, " ".join(species_list)
+    )
     #           (1.2) data about the reagents, used in pre-equilibrium computations:
-    reagentsDict = []
-    for reagent, PERsToggles in puzzle_definition["reagentPERs"].items():
-        reagentID = puzzle_definition["coefficient_dict"][reagent]
-        preEqulElemRxns = [
-            puzzle_definition["coefficient_array"][i]
-            for i in range(num_rxn)
-            if PERsToggles[i]
-        ]
-        if preEqulElemRxns == []:
-            logger.info(
-                f'        For the reagent #{reagentID} "{reagent}", no pre-equilibration needed.'
-            )
-            preEqulElemRxns = np.array([[0.0]], dtype=float)
-            reagent_speciesList = [reagent]
-        else:
-            # convert it into a numpy dict
-            preEqulElemRxns = np.array(preEqulElemRxns, dtype=float)
-            # a boolean array of whether each species specified in the puzzle file is present in this set of ElemRxns for preEqul.
-            if_uninvolvedSpecies = np.all(preEqulElemRxns == False, axis=0)
-            # now, remove unused species to simplify the rxn. set used for pre-equilibration of this particular reagent:
-            displacement = 0
-            # mask and remove columns of those unused species
-            for speciesID in range(num_mol):
-                # if this species is not used:
-                if if_uninvolvedSpecies[speciesID]:
-                    # http://stackoverflow.com/questions/1642730/how-to-delete-columns-in-numpy-array
-                    preEqulElemRxns = np.delete(
-                        preEqulElemRxns, speciesID - displacement, 1
-                    )
-                    displacement += 1
-            logger.info(f"            speciesList         : {speciesList}")
-            logger.info(f"            if_uninvolvedSpecies: {if_uninvolvedSpecies}")
-            # \n',preEqulElemRxns)
-            logger.info(
-                "            This should mask the previous matrix into: //omitted//"
-            )
-            reagent_speciesList = [
-                speciesList[i] for i in range(num_mol) if not if_uninvolvedSpecies[i]
-            ]
-        reagent_num_rxn = len(preEqulElemRxns)
-        reagent_num_mol = len(reagent_speciesList)
-        logger.info("            About pre-equilibration:")
-        logger.info(
-            f"                Elem. Rxn.s used for pre-equilibration (a total of {reagent_num_rxn}): \n"
-            + f"                    {preEqulElemRxns}"
-        )
-        logger.info(
-            f"                which involves {reagent_num_mol} species: {reagent_speciesList}"
-        )
-        reagentsDict.append(
-            (
-                reagent,
-                reaction_mechanism_class.reaction_mechanism(
-                    reagent_num_rxn,
-                    reagent_num_mol,
-                    reagent_speciesList,
-                    preEqulElemRxns,
-                    energy_dict,
-                ),
-            )
-        )
     #         - - - - - - - - - - - - - - -
     this_puzzle = puzzle_class.puzzle(
         num_rxn,
         num_mol,
-        speciesList,
+        species_list,
         elementary_reactions,
         energy_dict,
-        reagent_dictionary=reagentsDict,
-        Ea=Ea,
+        reagent_dictionary=[
+            # Note: We use a list here because we want to keep the order of the reagents as they are defined in the puzzle file.
+            # TODO: Why would it matter? The `.puz` files, when loaded into the Python realm as `dict`s, will not be ordered.
+            (
+                reagent,
+                make_reaction_mechanism_for_reagent(
+                    PERsToggles,
+                    data["jobID"],
+                    energy_dict,
+                    puzzle_definition,
+                    reagent,
+                    species_list,
+                ),
+            )
+            for reagent, PERsToggles in puzzle_definition["reagentPERs"].items()
+        ],
+        Ea=puzzle_definition["transition_state_energies"],
     )
-    #                                 num_rxn, num_mol, speciesList, elementary_reactions, energy_dict -> fed to class "reaction_mechanism"
-    #                                                                                                        reagentsDict, Ea -> fed to class puzzle
+    #                                 num_rxn, num_mol, species_list, elementary_reactions, energy_dict -> fed to class "reaction_mechanism"
+    #                                                                                                        reagents_dict, Ea -> fed to class puzzle
     logger.info("    (1) Puzzle Instance successfully created.")
     #    (2) Instance of the Condition class:
     # rxn_temp = temperature
@@ -251,7 +205,7 @@ def simulate_experiments_and_plot(
     m_concs = [0.0] * num_mol
     #         - - - - - - - - - - - - - - -
     this_condition: condition_class.Condition = condition_class.Condition(
-        temperature, speciesList, r_names, r_temps, r_concs, m_concs
+        temperature, species_list, r_names, r_temps, r_concs, m_concs
     )
     logger.info("    (2) Condition Instance successfully created.")
     #    (3) Instance of the Solution class:
@@ -260,14 +214,14 @@ def simulate_experiments_and_plot(
         coefficient_line_proposed = [0] * num_mol
         for each_slot in each_rxn_proposed:
             if each_slot != "":
-                coefficient_line_proposed[speciesList.index(each_slot)] += 1
+                coefficient_line_proposed[species_list.index(each_slot)] += 1
         coefficient_array_proposed.append(coefficient_line_proposed)
     num_rxn_proposed = len(coefficient_array_proposed)
     #         - - - - - - - - - - - - - - -
     this_solution = solution_class.solution(
         num_rxn_proposed,
         num_mol,
-        speciesList,
+        species_list,
         coefficient_array_proposed,
         energy_dict,
     )
@@ -298,6 +252,69 @@ def simulate_experiments_and_plot(
         user_data=user_data,
     )
     return plot_combined, plot_individual
+
+
+def make_reaction_mechanism_for_reagent(
+    is_each_involved: List[bool],
+    job_id: str,
+    energy_dict: Dict,
+    puzzle_definition: Dict,
+    reagent: str,
+    species_list: List[str],
+):
+    logger = logging.getLogger(job_id).getChild("make_reaction_mechanism_for_reagent")
+    reagent_id = puzzle_definition["coefficient_dict"][reagent]
+    # Filter for pre-equilibration reactions:
+    pre_equl_elem_rxns = [
+        # `is_involved` = "is this elementary reaction involved in the pre-equilibration of this reagent?"
+        rxn
+        for rxn, is_involved in zip(
+            puzzle_definition["coefficient_array"], is_each_involved
+        )
+        if is_involved
+    ]
+    if not pre_equl_elem_rxns:
+        logger.info(
+            f'        For the reagent #{reagent_id} "{reagent}", no pre-equilibration is needed.'
+        )
+        pre_equl_elem_rxns = np.array([[0.0]], dtype=float)
+        reagent_species_list = [reagent]
+    else:
+        # convert it into a numpy dict
+        pre_equl_elem_rxns = np.array(pre_equl_elem_rxns, dtype=float)
+        # a boolean array of whether each species specified in the puzzle file is present in this set of ElemRxns for preEqul.
+        if_uninvolvedSpecies: NDArray[np.bool_] = np.all(
+            pre_equl_elem_rxns == False, axis=0
+        )
+        # now, remove unused species to simplify the rxn. set used for pre-equilibration of this particular reagent:
+        pre_equl_elem_rxns = np.delete(
+            pre_equl_elem_rxns, np.where(if_uninvolvedSpecies), axis=1
+        )
+        logger.info(f"            species_list         : {species_list}")
+        logger.info(f"            if_uninvolvedSpecies: {if_uninvolvedSpecies}")
+        reagent_species_list = [
+            s
+            for s, uninvolved in zip(species_list, if_uninvolvedSpecies)
+            if not uninvolved
+        ]
+    reagent_num_rxn = len(pre_equl_elem_rxns)
+    reagent_num_mol = len(reagent_species_list)
+    logger.info("            About pre-equilibration:")
+    logger.info(
+        f"                Elem. Rxn.s used for pre-equilibration (a total of {reagent_num_rxn}): \n"
+        + f"                    {pre_equl_elem_rxns}"
+    )
+    logger.info(
+        f"                which involves {reagent_num_mol} species: {reagent_species_list}"
+    )
+    reaction_mechanism = reaction_mechanism_class.reaction_mechanism(
+        reagent_num_rxn,
+        reagent_num_mol,
+        reagent_species_list,
+        pre_equl_elem_rxns,
+        energy_dict,
+    )
+    return reaction_mechanism
 
 
 from kernel.engine.driver import run_proposed_experiment, run_true_experiment
