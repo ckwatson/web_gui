@@ -12,7 +12,7 @@ import threading
 import time
 import traceback
 from pprint import pprint
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import colored_traceback.auto
 import colorlog
@@ -327,12 +327,18 @@ def plot(
     # Finally, drive the engine with these data:
     logger.info("    (4) Simulating...")
     logger.info("         (a) True Model first:")
+    written_true_data: Optional[np.ndarray] = None
     # anticipate the file name where the true model's data is stored
     trueModel_fileName = f"{path_condition}plotData_t_{temperature}"
     if os.path.isfile(trueModel_fileName + "_.dat") and if_useCache:
         # Mechanism(true)+Condition for this puzzle already simulated before. Take advantage of the cache now...")
         logger.info(" cache available. Load from it.")
-        written_true_data = fileIO.load_modelData(trueModel_fileName + "_.dat")
+        try:
+            written_true_data = fileIO.load_modelData(trueModel_fileName + "_.dat")
+        except Exception as e:
+            logger.error(
+                f"Failed to load true model data from `{trueModel_fileName}_.dat`: {e}"
+            )
     else:
         # Mechanism(true)+Condition for this puzzle not calculated before; do it now...")
         logger.info(" simulating...")
@@ -346,6 +352,7 @@ def plot(
         )
         logger.info(f"            Got result in a type of {type(written_true_data)}.")
     logger.info("         (b) User Model then:")
+    written_user_data: Optional[np.ndarray] = None
     # anticipate the file name where the true model's data is stored
     userModel_fileName = f"{path_solution}plotData_t_{temperature}"
     if (
@@ -355,11 +362,15 @@ def plot(
         if os.path.isfile(userModel_fileName + "_.dat"):
             # Mechanism(solution)+Condition for this puzzle already simulated before. Take advantage of the cache now...")
             logger.info(" cache available. Load from it.")
-            written_user_data = fileIO.load_modelData(userModel_fileName + "_.dat")
+            try:
+                written_user_data = fileIO.load_modelData(userModel_fileName + "_.dat")
+            except Exception as e:
+                logger.error(
+                    f"Failed to load user model data from `{userModel_fileName}_.dat`: {e}"
+                )
         elif os.path.isfile(userModel_fileName + "_Failed"):
             # Mechanism(solution)+Condition for this puzzle already simulated before. Take advantage of the cache now...")
             logger.info(" UserModel failed as told by flag file.")
-            written_user_data = False
     else:
         # Mechanism(solution)+Condition for this puzzle not calculated before; do it now...")
         logger.info(" simulating...")
