@@ -38,18 +38,15 @@ driver.system_output = pprint
 
 np.seterr(all="warn")
 
+from pathlib import Path
+
 
 def all_files_in(mypath, end=""):
-    files = []
-    for f in os.listdir(mypath):
-        if (
-            os.path.isfile(os.path.join(mypath, f))
-            and not f.startswith(".")
-            and f.endswith(end)
-        ):
-            name = os.path.splitext(os.path.basename(f))[0]
-            files.append(name)
-    return files
+    return [
+        p.stem
+        for p in Path(mypath).iterdir()
+        if p.is_file() and not p.name.startswith(".") and p.name.endswith(end)
+    ]
 
 
 # For Server-Sent-Event support:
