@@ -159,8 +159,13 @@ def handle_plot_request():
         #    logger.info('Someone already submitted identical plotting job.')
         #    return # TODO: proper handle the conflict!
         else:  # we have to plot it ourselves! orz...
+            #    (0) First of all, load the Puzzle Data into backend:
+            with open(f"puzzles/{data['puzzle']}.puz") as json_file:
+                puzzleData = json.load(json_file)
+                logger.info("    (0) Successfully loaded Puzzle Data from file!")
             plot_combined, plot_individual = plot(
                 data,
+                puzzleData,
                 logger,
                 path_condition,
                 path_puzzle,
@@ -186,6 +191,7 @@ def handle_plot_request():
 
 def plot(
     data: Dict,
+    puzzleData: Dict,
     logger: logging.Logger,
     path_condition: str,
     path_puzzle: str,
@@ -202,10 +208,7 @@ def plot(
     if not os.path.isdir(path_solution):
         os.makedirs(path_solution)
     # Now start preparing the instances of custom classes for further actual use in Engine.Driver:
-    #    (0) First of all, load the Puzzle Data into backend:
-    with open(f"puzzles/{data['puzzle']}.puz") as json_file:
-        puzzleData = json.load(json_file)
-        logger.info("    (0) Successfully loaded Puzzle Data from file!")
+
     #    (1) Instance of the Puzzle class:
     #           (1.1) general data:
     elementary_reactions = np.array(puzzleData["coefficient_array"], dtype=float)
