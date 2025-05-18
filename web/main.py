@@ -297,7 +297,7 @@ def plot(
     r_temps = [reactant["temperature"] for reactant in data["conditions"]]
     m_concs = [0.0] * num_mol
     #         - - - - - - - - - - - - - - -
-    this_condition: condition_class.condition = condition_class.condition(
+    this_condition: condition_class.Condition = condition_class.Condition(
         temperature, speciesList, r_names, r_temps, r_concs, m_concs
     )
     logger.info("    (2) Condition Instance successfully created.")
