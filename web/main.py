@@ -134,7 +134,7 @@ def handle_plot_request():
             temperature,
         )
         logger.info(
-            f"Executed for {humanize.precisedelta(dt.datetime.now() - start_time)}s."
+            f"Executed for {humanize.precisedelta(dt.datetime.now() - start_time)}."
         )
         return jsonify(
             jobID=data["jobID"],
