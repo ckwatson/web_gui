@@ -2,6 +2,7 @@
 # , redirect, url_for, send_from_directory
 # from .crossdomain import crossdomain
 
+import datetime as dt
 import json
 import logging
 import os
@@ -13,6 +14,7 @@ from pprint import pprint
 from typing import Dict, Optional, Tuple
 
 import colorlog
+import humanize
 import jsonschema
 import numpy as np
 from flask import Flask, jsonify, render_template, request
@@ -99,7 +101,7 @@ schema = json.loads(schema)
 
 @app.route("/plot", methods=["POST", "OPTIONS"])
 def handle_plot_request():
-    startTime = time.time()  # start timer
+    start_time = dt.datetime.now()  # start timer
     data = request.get_json()  # receive JSON data
     # initialize logger for this particular job:
     # create a log_handler that streams messages to the web UI specifically for this job.
@@ -131,7 +133,9 @@ def handle_plot_request():
             plot_individual_filename,
             temperature,
         )
-        logger.info(f"Executed for {time.time() - startTime}s.")
+        logger.info(
+            f"Executed for {humanize.precisedelta(dt.datetime.now() - start_time)}s."
+        )
         return jsonify(
             jobID=data["jobID"],
             status="success",
@@ -142,7 +146,9 @@ def handle_plot_request():
     except Exception as error:
         # print out last words:
         logger.error(traceback.format_exc())
-        logger.info(f"Executed for {time.time() - startTime}s.")
+        logger.info(
+            f"Executed for {humanize.precisedelta(dt.datetime.now() - start_time)}."
+        )
         return jsonify(jobID=data["jobID"], status="error")
 
 

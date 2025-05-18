@@ -370,6 +370,15 @@ wheels = [
 ]
 
 [[package]]
+name = "humanize"
+version = "4.12.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/22/d1/bbc4d251187a43f69844f7fd8941426549bbe4723e8ff0a7441796b0789f/humanize-4.12.3.tar.gz", hash = "sha256:8430be3a615106fdfceb0b2c1b41c4c98c6b0fc5cc59663a5539b111dd325fb0", size = 80514, upload_time = "2025-04-30T11:51:07.98Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a0/1e/62a2ec3104394a2975a2629eec89276ede9dbe717092f6966fcf963e1bf0/humanize-4.12.3-py3-none-any.whl", hash = "sha256:2cbf6370af06568fa6d2da77c86edb7886f3160ecd19ee1ffef07979efc597f6", size = 128487, upload_time = "2025-04-30T11:51:06.468Z" },
+]
+
+[[package]]
 name = "itsdangerous"
 version = "2.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -823,6 +832,7 @@ dependencies = [
     { name = "flask-sse" },
     { name = "gevent" },
     { name = "gunicorn" },
+    { name = "humanize" },
     { name = "jinja2" },
     { name = "jsonschema" },
     { name = "markupsafe" },
@@ -839,6 +849,7 @@ requires-dist = [
     { name = "flask-sse", specifier = "~=0.2.1" },
     { name = "gevent", specifier = "~=25.5.1" },
     { name = "gunicorn", specifier = "~=20.0.4" },
+    { name = "humanize", specifier = ">=4.12.3" },
     { name = "jinja2", specifier = ">=2.11.3" },
     { name = "jsonschema", specifier = "~=3.2.0" },
     { name = "markupsafe", specifier = ">=3.0.2" },

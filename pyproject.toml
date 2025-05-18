@@ -16,6 +16,7 @@ dependencies = [
     "colorlog~=4.6.2",
     "jinja2>=2.11.3",
     "markupsafe>=3.0.2",
+    "humanize>=4.12.3",
 ]
 
 [tool.isort]
