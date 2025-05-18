@@ -373,10 +373,7 @@ def simulate_experiments_and_plot(
 
     logger.info("    (5) Drawing plots... ")
     (plot_individual, plot_combined) = plotter.sub_plots(
-        Temperature=temperature,
         plottingDict=puzzleData["coefficient_dict"],
-        solution_fileName=f"{path_solution}plotData_t_{temperature}",
-        condition_fileName=f"{path_condition}plotData_t_{temperature}",
         written_true_data=written_true_data,
         written_user_data=written_user_data,
     )
