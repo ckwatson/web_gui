@@ -12,6 +12,7 @@ import threading
 import time
 import traceback
 from pprint import pprint
+from typing import Dict, Tuple
 
 import colored_traceback.auto
 import colorlog
@@ -187,15 +188,15 @@ def handle_plot_request():
 
 
 def plot(
-    data,
-    logger,
-    path_condition,
-    path_puzzle,
-    path_solution,
-    plot_combined_filename,
-    plot_individual_filename,
-    temperature,
-):
+    data: Dict,
+    logger: logging.Logger,
+    path_condition: str,
+    path_puzzle: str,
+    path_solution: str,
+    plot_combined_filename: str,
+    plot_individual_filename: str,
+    temperature: float,
+) -> Tuple[str, str]:
     """
     Simulate the puzzle and draw plots.
     """
