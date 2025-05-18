@@ -2,10 +2,8 @@
 # , redirect, url_for, send_from_directory
 # from .crossdomain import crossdomain
 
-import hashlib
 import json
 import logging
-import mimetypes
 import os
 import sys
 import threading
@@ -14,11 +12,10 @@ import traceback
 from pprint import pprint
 from typing import Dict, Optional, Tuple
 
-import colored_traceback.auto
 import colorlog
 import jsonschema
 import numpy as np
-from flask import Flask, jsonify, render_template, request, send_file
+from flask import Flask, jsonify, render_template, request
 from flask_compress import Compress
 from flask_sse import sse
 
@@ -28,11 +25,12 @@ from kernel.data import (
     reaction_mechanism_class,
     solution_class,
 )
+from kernel.data.condition_class import condition
 
 # relative import fix. according to this: http://stackoverflow.com/a/12869607/1147061
 # import sys
 # sys.path.append('..')
-from kernel.engine import driver, fileIO
+from kernel.engine import driver, fileIO, plotter
 
 driver.temp_diag = False
 # TODO: Right now all usages of `system_output` in `driver` are commented out.
@@ -302,7 +300,7 @@ def plot(
     r_temps = [reactant["temperature"] for reactant in data["conditions"]]
     m_concs = [0.0] * num_mol
     #         - - - - - - - - - - - - - - -
-    this_condition = condition_class.condition(
+    this_condition: condition = condition_class.condition(
         temperature, speciesList, r_names, r_temps, r_concs, m_concs
     )
     logger.info("    (2) Condition Instance successfully created.")
@@ -326,6 +324,7 @@ def plot(
     logger.info("    (3) Solution Instance successfully created.")
     # Finally, drive the engine with these data:
     logger.info("    (4) Simulating...")
+
     logger.info("         (a) True Model first:")
     written_true_data: Optional[np.ndarray] = None
     # anticipate the file name where the true model's data is stored
@@ -342,14 +341,8 @@ def plot(
     else:
         # Mechanism(true)+Condition for this puzzle not calculated before; do it now...")
         logger.info(" simulating...")
-        written_true_data = driver.drive_data(
-            puzzle=this_puzzle,
-            # this is merely for backward compatibility.
-            puzzle_path=path_puzzle,
-            condition=this_condition,
-            condition_path=path_condition,
-            progress_tick=lambda x: 0,
-        )
+        # if we are simulating the true_model then solution argument is none
+        written_true_data = run_true_experiment(this_puzzle, this_condition)
         logger.info(f"            Got result in a type of {type(written_true_data)}.")
     logger.info("         (b) User Model then:")
     written_user_data: Optional[np.ndarray] = None
@@ -374,20 +367,15 @@ def plot(
     else:
         # Mechanism(solution)+Condition for this puzzle not calculated before; do it now...")
         logger.info(" simulating...")
-        written_user_data = driver.drive_data(
-            puzzle=this_puzzle,
-            # this is merely for backward compatibility.
-            puzzle_path=path_puzzle,
-            condition=this_condition,
-            condition_path=path_condition,
-            progress_tick=lambda x: 0,
-            solution=this_solution,
-            solution_path=path_solution,
-            written_true_data=written_true_data,
+        # if we are simulating the true_model then solution argument is none
+        written_user_data = run_proposed_experiment(
+            this_condition, path_condition, this_solution, written_true_data
         )
-        logger.info(f"             Got result in a type of {type(written_user_data)}.")
+        if written_user_data is None:
+            logger.error("The model you proposed failed.")
+
     logger.info("    (5) Drawing plots... ")
-    (plot_individual, plot_combined) = driver.plotter.sub_plots(
+    (plot_individual, plot_combined) = plotter.sub_plots(
         Temperature=temperature,
         plottingDict=puzzleData["coefficient_dict"],
         solution_fileName=f"{path_solution}plotData_t_{temperature}",
@@ -413,6 +401,9 @@ def plot(
     ).start()
     # ongoingJobs.remove(data['jobID'])
     return plot_combined, plot_individual
+
+
+from kernel.engine.driver import run_proposed_experiment, run_true_experiment
 
 
 @app.route("/save", methods=["POST", "OPTIONS"])
