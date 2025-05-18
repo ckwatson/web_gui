@@ -190,7 +190,7 @@ def simulate_experiments_and_plot(
             )
             for reagent, PERsToggles in puzzle_definition["reagentPERs"].items()
         ],
-        Ea=puzzle_definition["transition_state_energies"],
+        Ea=puzzle_definition.get("transition_state_energies", None),
     )
     logger.info("    (1) Puzzle Instance successfully created.")
     #    (2) Instance of the Condition class:
