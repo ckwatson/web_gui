@@ -85,7 +85,11 @@ AUTH_CODE = "123"
 # ongoingJobs = []
 
 app = Flask(__name__)
-Compress(app)  # https://github.com/libwilliam/flask-compress
+# Flask-compress is a Flask extension that provides gzip compression for the web app.
+# It is used to reduce the size of the response data sent from the server to the client,
+# which is helpful for us, because we are going to send tons of SVGs per job.
+# https://github.com/colour-science/flask-compress
+Compress(app)
 
 # redis configuation, for SSE support:
 # 'os.environ.get("REDIS_URL")' is for Heroku and "redis://localhost" is meant for localhost.
