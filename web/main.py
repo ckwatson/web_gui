@@ -34,7 +34,8 @@ from kernel.data import (
 from kernel.engine import driver, fileIO
 
 driver.temp_diag = False
-driver.system_output = pprint
+# TODO: Right now all usages of `system_output` in `driver` are commented out.
+# driver.system_output = pprint
 
 
 np.seterr(all="warn")
