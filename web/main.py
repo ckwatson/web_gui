@@ -123,6 +123,7 @@ def handle_plot_request():
             data,
             puzzle_definition,
             temperature,
+            diag=False,
         )
         logger.info(
             f"Executed for {humanize.precisedelta(dt.datetime.now() - start_time)}."
@@ -147,6 +148,7 @@ def simulate_experiments_and_plot(
     data: Dict,
     puzzle_definition: Dict,
     temperature: float,
+    diag: bool = False,
 ) -> Tuple[str, str]:
     """
     Simulate the puzzle and draw plots.
@@ -233,14 +235,14 @@ def simulate_experiments_and_plot(
 
     logger.info("             simulating...")
     true_data: np.ndarray = run_true_experiment(
-        data["jobID"], this_puzzle, this_condition
+        data["jobID"], this_puzzle, this_condition, diag=diag
     )
     logger.info("         (b) User Model then:")
 
     logger.info("             simulating...")
     # if we are simulating the true_model then solution argument is none
     user_data: Optional[np.ndarray] = run_proposed_experiment(
-        data["jobID"], this_condition, this_solution, true_data
+        data["jobID"], this_condition, this_solution, true_data, diag=diag
     )
     if user_data is None:
         logger.error("             The model you proposed failed.")
