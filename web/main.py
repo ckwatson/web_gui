@@ -454,16 +454,15 @@ def save():
                 return jsonify(status="success", message="Puzzle successfully saved.")
 
 
-def convert_reactions_to_coefficients(reactions, species_name_to_id):
+def convert_reactions_to_coefficients(reactions, species_name_to_id: Dict[str, int]):
+    num_species = len(species_name_to_id)
     matrix = []
     for reaction in reactions:
-        coefficients = [0.0] * len(species_name_to_id)
+        coefficients = [0.0] * num_species
         for i, speciesName in enumerate(reaction):
-            if speciesName == "":
-                continue  # skip empty entries
-            speciesID = species_name_to_id[speciesName]
-            delta = 1 if i > 1 else -1
-            coefficients[speciesID] += delta
+            if speciesName:
+                speciesID = species_name_to_id[speciesName]
+                coefficients[speciesID] += 1 if i > 1 else -1
         matrix.append(coefficients)
     return matrix
 
