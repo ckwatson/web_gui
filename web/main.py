@@ -85,19 +85,6 @@ handler.setFormatter(
 )
 # attach the to-console handler to the root logger
 rootLogger.addHandler(handler)
-# tell the program to send messages on its own behalf.
-logger = logging.getLogger(__name__)
-
-
-def np_err_handler(message, flag):
-    logger.error(
-        f"NumPy floating-point error: {message}\n"
-        + "".join(traceback.format_stack(limit=7)[:-1])
-    )
-
-
-np.seterrcall(np_err_handler)
-np.seterr(all="call")
 
 # Global variables, and also initializing the webapp using Flask framework:
 path_root = "results/"
