@@ -88,9 +88,7 @@ rootLogger.addHandler(handler)
 
 # Global variables, and also initializing the webapp using Flask framework:
 path_root = "results/"
-if_runningOnline = "DYNO" in os.environ  # detect whether on Heroku
-# use cache only when in production mode; in other words, don't use cache on local machine
-if_useCache = if_runningOnline
+
 AUTH_CODE = "123"
 # ongoingJobs = []
 
@@ -128,35 +126,19 @@ def handle_plot_request():
         plot_individual_filename = f"{plot_name}_individual.svg"
         plot_combined_filename = f"{plot_name}_combined.svg"
         temperature = data["temperature"]  # just a shorthand
-        # try whether result already generated:
-        if (
-            os.path.isfile(plot_individual_filename)
-            and os.path.isfile(plot_combined_filename)
-            and if_useCache
-        ):
-            logger.info("Figures already generated before. Skipped.")
-            with open(plot_individual_filename) as content_file:
-                plot_individual = content_file.read()
-            with open(plot_combined_filename) as content_file:
-                plot_combined = content_file.read()
-        # elif data['jobID'] in ongoingJobs: # not a job already done! let's see if anyone has been doing it...?
-        #    logger.info('Someone already submitted identical plotting job.')
-        #    return # TODO: proper handle the conflict!
-        else:  # we have to plot it ourselves! orz...
-            #    (0) First of all, load the Puzzle Data into backend:
-            with open(f"puzzles/{data['puzzle']}.puz") as json_file:
-                puzzleData = json.load(json_file)
-                logger.info("    (0) Successfully loaded Puzzle Data from file!")
-            plot_combined, plot_individual = simulate_experiments_and_plot(
-                data,
-                puzzleData,
-                logger,
-                path_condition,
-                path_solution,
-                plot_combined_filename,
-                plot_individual_filename,
-                temperature,
-            )
+
+        with open(f"puzzles/{data['puzzle']}.puz") as json_file:
+            puzzleData = json.load(json_file)
+            logger.info("    (0) Successfully loaded Puzzle Data from file!")
+        plot_combined, plot_individual = simulate_experiments_and_plot(
+            data,
+            puzzleData,
+            path_condition,
+            path_solution,
+            plot_combined_filename,
+            plot_individual_filename,
+            temperature,
+        )
         logger.info(f"Executed for {time.time() - startTime}s.")
         return jsonify(
             jobID=data["jobID"],
@@ -313,50 +295,25 @@ def simulate_experiments_and_plot(
     written_true_data: Optional[np.ndarray] = None
     # anticipate the file name where the true model's data is stored
     trueModel_fileName = f"{path_condition}plotData_t_{temperature}"
-    if os.path.isfile(trueModel_fileName + "_.dat") and if_useCache:
-        # Mechanism(true)+Condition for this puzzle already simulated before. Take advantage of the cache now...")
-        logger.info(" cache available. Load from it.")
-        try:
-            written_true_data = fileIO.load_modelData(trueModel_fileName + "_.dat")
-        except Exception as e:
-            logger.error(
-                f"Failed to load true model data from `{trueModel_fileName}_.dat`: {e}"
-            )
-    else:
-        # Mechanism(true)+Condition for this puzzle not calculated before; do it now...")
-        logger.info("             simulating...")
-        # if we are simulating the true_model then solution argument is none
-        written_true_data = run_true_experiment(this_puzzle, this_condition)
-        logger.info(f"            Got result in a type of {type(written_true_data)}.")
+
+    # Mechanism(true)+Condition for this puzzle not calculated before; do it now...")
+    logger.info("             simulating...")
+    # if we are simulating the true_model then solution argument is none
+    written_true_data = run_true_experiment(this_puzzle, this_condition)
+    logger.info(f"            Got result in a type of {type(written_true_data)}.")
     logger.info("         (b) User Model then:")
     written_user_data: Optional[np.ndarray] = None
     # anticipate the file name where the true model's data is stored
     userModel_fileName = f"{path_solution}plotData_t_{temperature}"
-    if (
-        os.path.isfile(userModel_fileName + "_.dat")
-        or os.path.isfile(userModel_fileName + "_Failed")
-    ) and if_useCache:
-        if os.path.isfile(userModel_fileName + "_.dat"):
-            # Mechanism(solution)+Condition for this puzzle already simulated before. Take advantage of the cache now...")
-            logger.info(" cache available. Load from it.")
-            try:
-                written_user_data = fileIO.load_modelData(userModel_fileName + "_.dat")
-            except Exception as e:
-                logger.error(
-                    f"Failed to load user model data from `{userModel_fileName}_.dat`: {e}"
-                )
-        elif os.path.isfile(userModel_fileName + "_Failed"):
-            # Mechanism(solution)+Condition for this puzzle already simulated before. Take advantage of the cache now...")
-            logger.info(" UserModel failed as told by flag file.")
-    else:
-        # Mechanism(solution)+Condition for this puzzle not calculated before; do it now...")
-        logger.info("             simulating...")
-        # if we are simulating the true_model then solution argument is none
-        written_user_data = run_proposed_experiment(
-            this_condition, path_condition, this_solution, written_true_data
-        )
-        if written_user_data is None:
-            logger.error("             The model you proposed failed.")
+
+    # Mechanism(solution)+Condition for this puzzle not calculated before; do it now...")
+    logger.info("             simulating...")
+    # if we are simulating the true_model then solution argument is none
+    written_user_data = run_proposed_experiment(
+        this_condition, path_condition, this_solution, written_true_data
+    )
+    if written_user_data is None:
+        logger.error("             The model you proposed failed.")
 
     logger.info("    (5) Drawing plots... ")
     (plot_individual, plot_combined) = plotter.sub_plots(
