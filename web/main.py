@@ -19,6 +19,7 @@ from flask import Flask, jsonify, render_template, request
 from flask_compress import Compress
 from flask_sse import sse
 from numpy._typing import NDArray
+from tabulate import tabulate
 
 from kernel.data import (
     condition_class,
@@ -117,7 +118,7 @@ def handle_plot_request():
 
         with open(f"puzzles/{data['puzzle']}.puz") as json_file:
             puzzle_definition = json.load(json_file)
-            logger.info("    (0) Successfully loaded Puzzle Data from file!")
+            logger.info("    Successfully loaded Puzzle Data from file!")
         plot_combined, plot_individual = simulate_experiments_and_plot(
             data,
             puzzle_definition,
@@ -168,6 +169,7 @@ def simulate_experiments_and_plot(
     )
     #           (1.2) data about the reagents, used in pre-equilibrium computations:
     #         - - - - - - - - - - - - - - -
+    logger.info("    (0) Pre-equilibration data:")
     this_puzzle = puzzle_class.puzzle(
         num_rxn,
         num_mol,
@@ -260,7 +262,12 @@ def make_reaction_mechanism_for_reagent(
     reagent: str,
     species_list: List[str],
 ):
+    """
+    Make a reaction mechanism for the natural reaction of the reagent when sitting idle in a canister/beaker.
+    This will be used for simulating the pre-equilibration of the reagent.
+    """
     logger = logging.getLogger(job_id).getChild("make_reaction_mechanism_for_reagent")
+    logger.info('        Making reaction mechanism for the reagent "%s":', reagent)
     reagent_id = puzzle_definition["coefficient_dict"][reagent]
     # Filter for pre-equilibration reactions:
     pre_equl_elem_rxns = [
@@ -273,7 +280,7 @@ def make_reaction_mechanism_for_reagent(
     ]
     if not pre_equl_elem_rxns:
         logger.info(
-            f'        For the reagent #{reagent_id} "{reagent}", no pre-equilibration is needed.'
+            f'            For the reagent #{reagent_id} "{reagent}", no pre-equilibration is needed.'
         )
         pre_equl_elem_rxns = np.array([[0.0]], dtype=float)
         reagent_species_list = [reagent]
@@ -288,26 +295,25 @@ def make_reaction_mechanism_for_reagent(
         pre_equl_elem_rxns = np.delete(
             pre_equl_elem_rxns, np.where(if_uninvolvedSpecies), axis=1
         )
-        logger.info(f"            species_list         : {species_list}")
-        logger.info(f"            if_uninvolvedSpecies: {if_uninvolvedSpecies}")
+        logger.debug(f"            species_list         : {species_list}")
+        logger.debug(f"            if_uninvolvedSpecies: {if_uninvolvedSpecies}")
+        # List of species involved in the pre-equilibration of this reagent.
         reagent_species_list = [
             s
             for s, uninvolved in zip(species_list, if_uninvolvedSpecies)
             if not uninvolved
         ]
-    reagent_num_rxn = len(pre_equl_elem_rxns)
-    reagent_num_mol = len(reagent_species_list)
-    logger.info("            About pre-equilibration:")
-    logger.info(
-        f"                Elem. Rxn.s used for pre-equilibration (a total of {reagent_num_rxn}): \n"
-        + f"                    {pre_equl_elem_rxns}"
-    )
-    logger.info(
-        f"                which involves {reagent_num_mol} species: {reagent_species_list}"
-    )
+        # Print out the pre-equilibration reactions:
+        table = tabulate(
+            pre_equl_elem_rxns,
+            headers=reagent_species_list,
+            floatfmt=".4g",
+            tablefmt="github",
+        )
+        logger.info("            About pre-equilibration:\n%s", table)
     reaction_mechanism = reaction_mechanism_class.reaction_mechanism(
-        reagent_num_rxn,
-        reagent_num_mol,
+        len(pre_equl_elem_rxns),
+        len(reagent_species_list),
         reagent_species_list,
         pre_equl_elem_rxns,
         energy_dict,
