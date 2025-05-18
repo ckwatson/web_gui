@@ -116,6 +116,7 @@ def handle_plot_request():
         plot_name = path_solution + f"/{data['temperature']}"
         plot_individual_filename = f"{plot_name}_individual.svg"
         plot_combined_filename = f"{plot_name}_combined.svg"
+
         temperature = data["temperature"]  # just a shorthand
 
         with open(f"puzzles/{data['puzzle']}.puz") as json_file:
