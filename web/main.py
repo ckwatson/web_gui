@@ -181,9 +181,6 @@ def handle_plot_request():
         # print out last words:
         logger.error(traceback.format_exc())
         logger.info(f"Executed for {time.time() - startTime}s.")
-        # now unbind all log-handlers, so that the logger won't waste its time sending messages to this audience in later calls.
-        # redirect the logs since NOW
-        rootLogger.removeHandler(logging_handler)
         return jsonify(jobID=data["jobID"], status="error")
 
 
