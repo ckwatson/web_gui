@@ -78,8 +78,6 @@ handler.setFormatter(
 # attach the to-console handler to the root logger
 rootLogger.addHandler(handler)
 
-# Global variables, and also initializing the webapp using Flask framework:
-path_root = "results/"
 
 AUTH_CODE = "123"
 # ongoingJobs = []
@@ -115,27 +113,14 @@ def handle_plot_request():
     logger = job_logger.getChild("handle_plot_request")
     # now the serious part:
     try:
-        # prepare directories:
-        path_puzzle = f"{path_root}{data['puzzle']}/"
-        path_condition = f"{path_puzzle}condition_{data['conditionID']}/"
-        path_solution = f"{path_condition}solution_{data['solutionID']}/"
-        # prepare figure file_names:
-        plot_name = path_solution + f"/{data['temperature']}"
-        plot_individual_filename = f"{plot_name}_individual.svg"
-        plot_combined_filename = f"{plot_name}_combined.svg"
-
         temperature = data["temperature"]  # just a shorthand
 
         with open(f"puzzles/{data['puzzle']}.puz") as json_file:
-            puzzleData = json.load(json_file)
+            puzzle_definition = json.load(json_file)
             logger.info("    (0) Successfully loaded Puzzle Data from file!")
         plot_combined, plot_individual = simulate_experiments_and_plot(
             data,
-            puzzleData,
-            path_condition,
-            path_solution,
-            plot_combined_filename,
-            plot_individual_filename,
+            puzzle_definition,
             temperature,
         )
         logger.info(
@@ -159,11 +144,7 @@ def handle_plot_request():
 
 def simulate_experiments_and_plot(
     data: Dict,
-    puzzleData: Dict,
-    path_condition: str,
-    path_solution: str,
-    plot_combined_filename: str,
-    plot_individual_filename: str,
+    puzzle_definition: Dict,
     temperature: float,
 ) -> Tuple[str, str]:
     """
@@ -171,28 +152,28 @@ def simulate_experiments_and_plot(
     """
     logger = logging.getLogger(data["jobID"]).getChild("simulate_experiments_and_plot")
     logger.info("================== RECEIVED PLOTTING JOB ==================")
-    # we check the deepest folder, which implies all parent-grandparent folders exist.
-    if not os.path.isdir(path_solution):
-        os.makedirs(path_solution)
     # Now start preparing the instances of custom classes for further actual use in Engine.Driver:
 
     #    (1) Instance of the Puzzle class:
     #           (1.1) general data:
-    elementary_reactions = np.array(puzzleData["coefficient_array"], dtype=float)
-    energy_dict = puzzleData["energy_dict"]
+    elementary_reactions = np.array(puzzle_definition["coefficient_array"], dtype=float)
+    energy_dict = puzzle_definition["energy_dict"]
     Ea = None  # puzzleData['transition_state_energies']
     # logger.info('        SpeciesList involved are:',' '.join(speciesList))
     speciesList = sorted(
-        puzzleData["coefficient_dict"], key=puzzleData["coefficient_dict"].get
+        puzzle_definition["coefficient_dict"],
+        key=puzzle_definition["coefficient_dict"].get,
     )
-    num_rxn = len(puzzleData["coefficient_array"])
+    num_rxn = len(puzzle_definition["coefficient_array"])
     num_mol = len(speciesList)
     #           (1.2) data about the reagents, used in pre-equilibrium computations:
     reagentsDict = []
-    for reagent, PERsToggles in puzzleData["reagentPERs"].items():
-        reagentID = puzzleData["coefficient_dict"][reagent]
+    for reagent, PERsToggles in puzzle_definition["reagentPERs"].items():
+        reagentID = puzzle_definition["coefficient_dict"][reagent]
         preEqulElemRxns = [
-            puzzleData["coefficient_array"][i] for i in range(num_rxn) if PERsToggles[i]
+            puzzle_definition["coefficient_array"][i]
+            for i in range(num_rxn)
+            if PERsToggles[i]
         ]
         if preEqulElemRxns == []:
             logger.info(
@@ -295,51 +276,27 @@ def simulate_experiments_and_plot(
     logger.info("    (4) Simulating...")
 
     logger.info("         (a) True Model first:")
-    written_true_data: Optional[np.ndarray] = None
-    # anticipate the file name where the true model's data is stored
-    trueModel_fileName = f"{path_condition}plotData_t_{temperature}"
 
-    # Mechanism(true)+Condition for this puzzle not calculated before; do it now...")
     logger.info("             simulating...")
-    # if we are simulating the true_model then solution argument is none
-    written_true_data = run_true_experiment(data["jobID"], this_puzzle, this_condition)
-    logger.info(f"            Got result in a type of {type(written_true_data)}.")
-    logger.info("         (b) User Model then:")
-    written_user_data: Optional[np.ndarray] = None
-    # anticipate the file name where the true model's data is stored
-    userModel_fileName = f"{path_solution}plotData_t_{temperature}"
-
-    # Mechanism(solution)+Condition for this puzzle not calculated before; do it now...")
-    logger.info("             simulating...")
-    # if we are simulating the true_model then solution argument is none
-    written_user_data = run_proposed_experiment(
-        data["jobID"], this_condition, path_condition, this_solution, written_true_data
+    true_data: np.ndarray = run_true_experiment(
+        data["jobID"], this_puzzle, this_condition
     )
-    if written_user_data is None:
+    logger.info("         (b) User Model then:")
+
+    logger.info("             simulating...")
+    # if we are simulating the true_model then solution argument is none
+    user_data: Optional[np.ndarray] = run_proposed_experiment(
+        data["jobID"], this_condition, this_solution, true_data
+    )
+    if user_data is None:
         logger.error("             The model you proposed failed.")
 
     logger.info("    (5) Drawing plots... ")
     (plot_individual, plot_combined) = plotter.sub_plots(
-        plottingDict=puzzleData["coefficient_dict"],
-        true_data=written_true_data,
-        user_data=written_user_data,
+        plottingDict=puzzle_definition["coefficient_dict"],
+        true_data=true_data,
+        user_data=user_data,
     )
-    # end Timer
-    logger.info(
-        "    (6) Now that everything is finished, write simulated data to file for caching..."
-    )
-    threading.Thread(
-        target=fileIO.save_modelData, args=(written_true_data, trueModel_fileName)
-    ).start()
-    threading.Thread(
-        target=fileIO.save_modelData, args=(written_user_data, userModel_fileName)
-    ).start()
-    threading.Thread(
-        target=fileIO.save_figure, args=(plot_individual, plot_individual_filename)
-    ).start()
-    threading.Thread(
-        target=fileIO.save_figure, args=(plot_combined, plot_combined_filename)
-    ).start()
     return plot_combined, plot_individual
 
 
