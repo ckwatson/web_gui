@@ -374,8 +374,8 @@ def simulate_experiments_and_plot(
     logger.info("    (5) Drawing plots... ")
     (plot_individual, plot_combined) = plotter.sub_plots(
         plottingDict=puzzleData["coefficient_dict"],
-        written_true_data=written_true_data,
-        written_user_data=written_user_data,
+        true_data=written_true_data,
+        user_data=written_user_data,
     )
     # end Timer
     logger.info(
