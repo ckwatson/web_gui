@@ -208,7 +208,7 @@ def plot(
         logger.info("    (0) Successfully loaded Puzzle Data from file!")
     #    (1) Instance of the Puzzle class:
     #           (1.1) general data:
-    elemRxns = np.array(puzzleData["coefficient_array"], dtype=float)
+    elementary_reactions = np.array(puzzleData["coefficient_array"], dtype=float)
     energy_dict = puzzleData["energy_dict"]
     Ea = None  # puzzleData['transition_state_energies']
     # logger.info('        SpeciesList involved are:',' '.join(speciesList))
@@ -282,12 +282,12 @@ def plot(
         num_rxn,
         num_mol,
         speciesList,
-        elemRxns,
+        elementary_reactions,
         energy_dict,
         reagent_dictionary=reagentsDict,
         Ea=Ea,
     )
-    #                                 num_rxn, num_mol, speciesList, elemRxns, energy_dict -> fed to class "reaction_mechanism"
+    #                                 num_rxn, num_mol, speciesList, elementary_reactions, energy_dict -> fed to class "reaction_mechanism"
     #                                                                                                        reagentsDict, Ea -> fed to class puzzle
     logger.info("    (1) Puzzle Instance successfully created.")
     #    (2) Instance of the Condition class:
